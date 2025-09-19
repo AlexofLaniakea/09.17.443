@@ -29,10 +29,12 @@ public class Body : MonoBehaviour
     void FixedUpdate()
     {
         foreach(GameObject ship in ships){
-            float distance = Vector3.Distance(transform.position, ship.transform.position) * 10000;
+            float distance = Vector3.Distance(transform.position, ship.transform.position) * 1000;
             float acceleration =  G * mass / Mathf.Pow(distance, 2);
-            Vector3 offset = ship.transform.position - transform.position;
-            Debug.Log(acceleration);
+            Vector3 offset = transform.position - ship.transform.position;
+            offset = offset.normalized;
+            SimpleShipScript simpleShipScript = ship.GetComponent<SimpleShipScript>();
+            simpleShipScript.SetGravityForce(acceleration, offset);
         }
     }
 }
