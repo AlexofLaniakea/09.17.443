@@ -56,6 +56,7 @@ public class SimpleShipScript : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         cf = GetComponent<ConstantForce>();
         rb.sleepThreshold = 0.0f;
+        transform.position = new Vector3(13000f, 0f, 13000f);
         //rb.linearVelocity = Vector3.forward * 10f; 
     }
 
@@ -93,7 +94,7 @@ public class SimpleShipScript : MonoBehaviour
             netForce += v.getVector();
         }
         //Debug.Log(gravityVectors.Count);
-        cf.force = netForce * Mathf.Pow(10, -3) * timeScale;
+        cf.force = netForce * Mathf.Pow(10, -3) * Mathf.Pow(timeScale, 2);
     }
 
 }

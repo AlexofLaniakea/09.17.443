@@ -795,7 +795,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Hello
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -904,6 +904,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   body: {fileID: 769705363}
+  focus: {fileID: 0}
+  core: {fileID: 0}
 --- !u!4 &715843915
 Transform:
   m_ObjectHideFlags: 0
@@ -1716,7 +1718,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000000
+  far clip plane: 1e+10
   field of view: 60
   orthographic: 0
   orthographic size: 5

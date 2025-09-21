@@ -26,6 +26,6 @@ public class TimeScalerScript : MonoBehaviour
     // Called whenever the slider moves
     private void OnSliderChanged(float value)
     {
-        timeScale = value * 999f + 1f;
+        timeScale = value * 39f + 1f;
     }
 }
