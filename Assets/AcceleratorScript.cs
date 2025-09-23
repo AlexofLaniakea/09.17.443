@@ -19,7 +19,7 @@ public class AcceleratorScript : MonoBehaviour
 
     void Update()
     {
-        script.setAcceleration(acceleration);
+        script.SetThrust(acceleration);
     }
 
     // Called whenever the slider moves

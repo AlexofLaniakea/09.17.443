@@ -10,11 +10,12 @@ public class MainScript : MonoBehaviour//Manage space objects
     private List<GameObject> bodies = new List<GameObject>();
     public GameObject focus;
     public GameObject core;
+    public GameObject ship;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        GameObject earth = Instantiate(body);
+        /*GameObject earth = Instantiate(body);
         Body earthScript = earth.GetComponent<Body>();
         earthScript.Initialize("Earth", 12786f, (float)5.972 * Mathf.Pow(10, 24), 10000000f, 0f, 2.66f * Mathf.Pow(10, -6));
         GameObject moon = Instantiate(body);
@@ -28,9 +29,11 @@ public class MainScript : MonoBehaviour//Manage space objects
         bodies.Add(earth);
         bodies.Add(moon);
         //earth.GetComponent<Rigidbody>().linearVelocity = new Vector3(1f, 1f, 1f);
-        focus = earth;
+        focus = earth;*/
 
-        StartCoroutine(Clock());
+
+
+        StartCoroutine(ClockOneSecond());
     }
 
     // Update is called once per frame
@@ -39,13 +42,19 @@ public class MainScript : MonoBehaviour//Manage space objects
         
     }
 
-    IEnumerator Clock()
+    IEnumerator ClockOneSecond()
     {
         while(true)
         {
-            focus.transform.position = new Vector3(0f,0f,0f);
+            /*focus.transform.position = new Vector3(0f,0f,0f);
             focus.GetComponent<Body>().RenderSatellites();
-            focus.SetActive(true);
+            focus.SetActive(true);*/
+
+            SimpleShipScript shipScript = ship.GetComponent<SimpleShipScript>();
+
+            shipScript.PhysicsClock();
+
+            //Next render all planets relative to ship
 
             yield return new WaitForSeconds(1f);
         }

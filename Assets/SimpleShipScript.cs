@@ -9,9 +9,28 @@ public class SimpleShipScript : MonoBehaviour
     public float gravityMagnitude;
     public Vector3 gravityDirection;
     public List<GravityVector> gravityVectors = new List<GravityVector>();
-    public float mass = 1f;
+    
+    
     private float timeScale = 1f; //All velocities and accelerations should be multiplied by timescale
-    public float acceleration = 0f;
+    
+    public float accelerationMagnitude = 0f;
+    public Vector3 accelerationDirection;
+
+    //Physics scalars
+    public float mass = 1f;
+    public float thrust= 0f;
+
+    //3D kinematics variables
+    private Vector3 position;
+    private Vector3 velocity;
+    private Vector3 acceleration;
+    
+
+    //Polar coordinate
+    private float distance;
+    private float azimuth;
+    private float elevation;
+
 
     public void SetGravityForce(float gravityAcceleration, Vector3 vector){
         gravityMagnitude = gravityAcceleration * mass;
@@ -37,16 +56,16 @@ public class SimpleShipScript : MonoBehaviour
 
     }
 
-    public void setAcceleration(float acceleration){
-        this.acceleration = acceleration;
+    public void SetThrust(float thrust){
+        this.thrust = thrust;
     }
 
     public float getTimeScale(){
         return timeScale;
     }
 
-    public float getAcceleration(){
-        return acceleration;
+    public float GetThrust(){
+        return thrust;
     }
 
 
@@ -86,7 +105,7 @@ public class SimpleShipScript : MonoBehaviour
     }
 
     void FixedUpdate(){
-        Vector3 gravityVector = gravityMagnitude * gravityDirection;
+        /*Vector3 gravityVector = gravityMagnitude * gravityDirection;
         Vector3 accelerationVector = transform.forward.normalized * acceleration;
         //Vector3 netForce = (accelerationVector + gravityVector) * Mathf.Pow(10, -3) * timeScale;
         Vector3 netForce = accelerationVector;
@@ -94,7 +113,17 @@ public class SimpleShipScript : MonoBehaviour
             netForce += v.getVector();
         }
         //Debug.Log(gravityVectors.Count);
-        cf.force = netForce * Mathf.Pow(10, -3) * Mathf.Pow(timeScale, 2);
+        cf.force = netForce * Mathf.Pow(10, -3) * Mathf.Pow(timeScale, 2);*/
+    }
+
+
+    public void PhysicsClock(){
+        acceleration = thrust * transform.forward.normalized;
+
+        velocity += acceleration;
+        position += velocity;
+
+        Debug.Log(position);
     }
 
 }
