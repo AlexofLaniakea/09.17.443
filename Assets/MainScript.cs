@@ -15,9 +15,9 @@ public class MainScript : MonoBehaviour//Manage space objects
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        /*GameObject earth = Instantiate(body);
+        GameObject earth = Instantiate(body);
         Body earthScript = earth.GetComponent<Body>();
-        earthScript.Initialize("Earth", 12786f, (float)5.972 * Mathf.Pow(10, 24), 10000000f, 0f, 2.66f * Mathf.Pow(10, -6));
+        earthScript.Initialize("Earth", 12786, (float)5.972 * Mathf.Pow(10, 24), 150000000f, 0f, 2.66f * Mathf.Pow(10, -6));
         GameObject moon = Instantiate(body);
         Body moonScript = moon.GetComponent<Body>();
         moonScript.Initialize("Moon", 3474, (float)7.348 * Mathf.Pow(10, 22), 348400f, 0f, 2.66f * Mathf.Pow(10, -6));
@@ -29,8 +29,7 @@ public class MainScript : MonoBehaviour//Manage space objects
         bodies.Add(earth);
         bodies.Add(moon);
         //earth.GetComponent<Rigidbody>().linearVelocity = new Vector3(1f, 1f, 1f);
-        focus = earth;*/
-
+        focus = moon;
 
 
         StartCoroutine(ClockOneSecond());
@@ -52,9 +51,19 @@ public class MainScript : MonoBehaviour//Manage space objects
 
             SimpleShipScript shipScript = ship.GetComponent<SimpleShipScript>();
 
+
             shipScript.PhysicsClock();
 
             //Next render all planets relative to ship
+            Vector3 shipPosition = shipScript.GetPosition();
+            focus.transform.position = shipPosition * -1;
+            focus.SetActive(true);
+            focus.GetComponent<Body>().RenderSatellites();
+            focus.GetComponent<Body>().RenderPrimary();
+
+            //When gravity from satellite becomes greater than that of the focus, switch to satellite
+            //When gravity from primary becomes greater than that of the focus, switch to primary
+        
 
             yield return new WaitForSeconds(1f);
         }

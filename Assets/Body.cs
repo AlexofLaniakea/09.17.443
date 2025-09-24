@@ -11,7 +11,10 @@ public class Body : MonoBehaviour
     private List<GameObject> ships;
     private float G = (float)6.673 * Mathf.Pow(10, -11);
     private float velocity = 0f;
+
     private List<GameObject> satellites;
+    private GameObject primary;
+
     private float distance;
     private float angle;
     private float angularVelocity;
@@ -49,6 +52,9 @@ public class Body : MonoBehaviour
         {
             ships.Add(child.gameObject);
         }
+
+        gb = this.gameObject;
+
     }
 
     public void SetAngularVelocity(float angularVelocity){
@@ -65,6 +71,12 @@ public class Body : MonoBehaviour
 
     public void AddSatellite(GameObject satellite){
         satellites.Add(satellite);
+        satellite.GetComponent<Body>().SetPrimary(gb);
+    }
+
+    public void SetPrimary(GameObject primary){
+        this.primary = primary;
+        Debug.Log(primary);
     }
 
     public float GetAngularVelocity(){
@@ -83,17 +95,6 @@ public class Body : MonoBehaviour
         return distance;
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-    }
-
-    // Upate is called once per frame
-    void Update()
-    {
-        //Find the distance between body and all nearby ships and add force?
-    }
-
     void FixedUpdate()
     {
         if(!gameObject.activeSelf){
@@ -103,13 +104,13 @@ public class Body : MonoBehaviour
         float timeScale = 1f;
         
 
-        foreach(GameObject ship in ships){
+        foreach(GameObject ship in ships){//Something wrong here
             float distance = Vector3.Distance(transform.position, ship.transform.position) * 1000f;
+            Debug.Log(distance);
             float acceleration =  G * mass / Mathf.Pow(distance, 2);
             Vector3 offset = transform.position - ship.transform.position;
             offset = offset.normalized;
             SimpleShipScript simpleShipScript = ship.GetComponent<SimpleShipScript>();
-            simpleShipScript.SetGravityForce(acceleration, offset);
             simpleShipScript.AddGravity(name, acceleration * offset);
             timeScale = simpleShipScript.getTimeScale();
         }
@@ -148,5 +149,15 @@ public class Body : MonoBehaviour
             satelliteScript.RenderSatellites();
             satellite.SetActive(true);
         }
+    }
+
+    public void RenderPrimary(){
+        //Body primaryScript = primary.GetComponent<Body>();
+        float x = transform.position.x - distance * Mathf.Cos(angle);
+        float y = transform.position.y;
+        float z = transform.position.z - distance * Mathf.Sin(angle);
+        primary.transform.position = new Vector3(x,y,z);
+        angle += angularVelocity;
+        primary.SetActive(true);
     }
 }

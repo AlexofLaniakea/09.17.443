@@ -68,6 +68,10 @@ public class SimpleShipScript : MonoBehaviour
         return thrust;
     }
 
+    public Vector3 GetPosition(){
+        return position;
+    }
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -75,8 +79,7 @@ public class SimpleShipScript : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         cf = GetComponent<ConstantForce>();
         rb.sleepThreshold = 0.0f;
-        transform.position = new Vector3(13000f, 0f, 13000f);
-        //rb.linearVelocity = Vector3.forward * 10f; 
+        position = new Vector3(13000f, 0f, 0f);
     }
 
     // Update is called once per frame
@@ -119,11 +122,12 @@ public class SimpleShipScript : MonoBehaviour
 
     public void PhysicsClock(){
         acceleration = thrust * transform.forward.normalized;
+       /* foreach(GravityVector v in gravityVectors){
+            acceleration += v.getVector();
+            Debug.Log(v.getName() + " " + acceleration);
+        }*/
 
         velocity += acceleration;
         position += velocity;
-
-        Debug.Log(position);
     }
-
 }
