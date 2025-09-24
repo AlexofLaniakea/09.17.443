@@ -25,6 +25,6 @@ public class AcceleratorScript : MonoBehaviour
     // Called whenever the slider moves
     private void OnSliderChanged(float value)
     {
-        acceleration = value * 10f;
+        acceleration = value * Mathf.Pow(10, -3);
     }
 }

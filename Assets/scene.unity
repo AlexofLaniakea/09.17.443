@@ -906,6 +906,7 @@ MonoBehaviour:
   body: {fileID: 769705363}
   focus: {fileID: 0}
   core: {fileID: 0}
+  ship: {fileID: 1203684100}
 --- !u!4 &715843915
 Transform:
   m_ObjectHideFlags: 0
@@ -959,7 +960,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -1366,8 +1367,10 @@ MonoBehaviour:
   rotationSpeed: 100
   gravityMagnitude: 0
   gravityDirection: {x: 0, y: 0, z: 0}
+  accelerationMagnitude: 0
+  accelerationDirection: {x: 0, y: 0, z: 0}
   mass: 1
-  acceleration: 9.8
+  thrust: 0
 --- !u!54 &1203684106
 Rigidbody:
   m_ObjectHideFlags: 0

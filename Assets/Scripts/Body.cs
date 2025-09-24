@@ -76,7 +76,6 @@ public class Body : MonoBehaviour
 
     public void SetPrimary(GameObject primary){
         this.primary = primary;
-        Debug.Log(primary);
     }
 
     public float GetAngularVelocity(){
@@ -96,29 +95,12 @@ public class Body : MonoBehaviour
     }
 
     void FixedUpdate()
-    {
-        if(!gameObject.activeSelf){
-            return;
-        }
-
-        float timeScale = 1f;
-        
-
-        foreach(GameObject ship in ships){//Something wrong here
-            float distance = Vector3.Distance(transform.position, ship.transform.position) * 1000f;
-            Debug.Log(distance);
-            float acceleration =  G * mass / Mathf.Pow(distance, 2);
-            Vector3 offset = transform.position - ship.transform.position;
-            offset = offset.normalized;
-            SimpleShipScript simpleShipScript = ship.GetComponent<SimpleShipScript>();
-            simpleShipScript.AddGravity(name, acceleration * offset);
-            timeScale = simpleShipScript.getTimeScale();
-        }
+    {    
 
         //Move satellites
         /*foreach(GameObject satellite in satellites){
             float distance = Vector3.Distance(transform.position, satellite.transform.position);
-            //Debug.Log(distance);
+            //Debug.Log(distance);  
             Vector3 offset = transform.position - satellite.transform.position;
             offset = offset.normalized;
             Vector3 tangent = Vector3.Cross(Vector3.up, offset).normalized;
@@ -129,9 +111,23 @@ public class Body : MonoBehaviour
         }*/
     }
 
-    public void OnClockTick(){
+    public void PhysicsClock(){
+        if(!gameObject.activeSelf){
+            return;
+        }
+
         float timeScale = Parameters.getTimeScale();
-        //
+        
+
+        foreach(GameObject ship in ships){//Something wrong here
+            float distance = Vector3.Distance(transform.position, ship.transform.position) * 1000f;
+            float acceleration =  G * mass / Mathf.Pow(distance, 2) * Mathf.Pow(10, -3);
+            Vector3 offset = transform.position - ship.transform.position;
+            offset = offset.normalized;
+            SimpleShipScript simpleShipScript = ship.GetComponent<SimpleShipScript>();
+            simpleShipScript.AddGravity(name, acceleration * offset);
+            timeScale = simpleShipScript.getTimeScale();
+        }
     }
 
     public void RenderSatellites(){

@@ -20,7 +20,7 @@ public class SimpleShipScript : MonoBehaviour
     public float mass = 1f;
     public float thrust= 0f;
 
-    //3D kinematics variables
+    //3D kinematics variables. Stored in 1 unit = 1000 m
     private Vector3 position;
     private Vector3 velocity;
     private Vector3 acceleration;
@@ -58,6 +58,10 @@ public class SimpleShipScript : MonoBehaviour
 
     public void SetThrust(float thrust){
         this.thrust = thrust;
+    }
+
+    public void SetPosition(Vector3 position){
+        this.position = position;
     }
 
     public float getTimeScale(){
@@ -115,17 +119,20 @@ public class SimpleShipScript : MonoBehaviour
         foreach(GravityVector v in gravityVectors){
             netForce += v.getVector();
         }
-        //Debug.Log(gravityVectors.Count);
         cf.force = netForce * Mathf.Pow(10, -3) * Mathf.Pow(timeScale, 2);*/
     }
 
 
     public void PhysicsClock(){
         acceleration = thrust * transform.forward.normalized;
-       /* foreach(GravityVector v in gravityVectors){
+       foreach(GravityVector v in gravityVectors){
             acceleration += v.getVector();
-            Debug.Log(v.getName() + " " + acceleration);
-        }*/
+            //Debug.Log(v.getName() + " " + v.getVector().x);
+        }
+
+        acceleration = acceleration * Mathf.Pow(timeScale, 2);
+        Debug.Log(acceleration);
+
 
         velocity += acceleration;
         position += velocity;
