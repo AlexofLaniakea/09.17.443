@@ -83,7 +83,7 @@ public class SimpleShipScript : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         cf = GetComponent<ConstantForce>();
         rb.sleepThreshold = 0.0f;
-        position = new Vector3(13000f, 0f, 0f);
+        position = new Vector3(150000, 0f, 0f);
     }
 
     // Update is called once per frame
@@ -131,8 +131,6 @@ public class SimpleShipScript : MonoBehaviour
         }
 
         acceleration = acceleration * Mathf.Pow(timeScale, 2);
-        Debug.Log(acceleration);
-
 
         velocity += acceleration;
         position += velocity;

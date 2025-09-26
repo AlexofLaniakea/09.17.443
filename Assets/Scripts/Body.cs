@@ -94,6 +94,14 @@ public class Body : MonoBehaviour
         return distance;
     }
 
+    public List<GameObject> GetSatellites(){
+        return satellites;
+    }
+
+    public GameObject GetPrimary(){
+        return primary;
+    }
+
     void FixedUpdate()
     {    
 
@@ -148,12 +156,13 @@ public class Body : MonoBehaviour
     }
 
     public void RenderPrimary(){
-        //Body primaryScript = primary.GetComponent<Body>();
+        Body primaryScript = primary.GetComponent<Body>();
         float x = transform.position.x - distance * Mathf.Cos(angle);
         float y = transform.position.y;
         float z = transform.position.z - distance * Mathf.Sin(angle);
         primary.transform.position = new Vector3(x,y,z);
         angle += angularVelocity;
         primary.SetActive(true);
+        primaryScript.RenderSatellites();
     }
 }
