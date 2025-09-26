@@ -130,6 +130,8 @@ public class SimpleShipScript : MonoBehaviour
             //Debug.Log(v.getName() + " " + v.getVector().x);
         }
 
+        //Change focus if another body has stronger gravity than the current focus
+
         acceleration = acceleration * Mathf.Pow(timeScale, 2);
 
         velocity += acceleration;

@@ -61,8 +61,12 @@ public class MapDisplay : MonoBehaviour
 
             satellites.Add(image);
         }
+
+        Vector2 position = new Vector2(shipScript.GetPosition().x, shipScript.GetPosition().y);
+        position = position / radius;
+        position = position * mapWidth / 2;
         
-        //Create satellite display objects
+        shipDot.GetComponent<RectTransform>().localPosition = position;
     }
 
     public void UpdateDisplay(){

@@ -25,12 +25,12 @@ public class MainScript : MonoBehaviour//Manage space objects
 
         GameObject earth = Instantiate(body);
         Body earthScript = earth.GetComponent<Body>();
-        earthScript.Initialize("Earth", 12786, (float)5.972 * Mathf.Pow(10, 24), 150000000f, 0f, 2.66f * Mathf.Pow(10, -6));
+        earthScript.Initialize("Earth", 12786, (float)5.972 * Mathf.Pow(10, 24), 150000000f, 0.39f, 2.66f * Mathf.Pow(10, -6));
         sunScript.AddSatellite(earth);
 
         GameObject jupiter = Instantiate(body);
         Body jupiterScript = jupiter.GetComponent<Body>();
-        jupiterScript.Initialize("Jupiter", 139820, (float)1.898 * Mathf.Pow(10, 27), 773000000f, 0f, 1.67f * Mathf.Pow(10, -8));
+        jupiterScript.Initialize("Jupiter", 139820, (float)1.898 * Mathf.Pow(10, 27), 773000000f, 0.106f, 1.67f * Mathf.Pow(10, -8));
         bodies.Add(jupiter);
         sunScript.AddSatellite(jupiter);
 
