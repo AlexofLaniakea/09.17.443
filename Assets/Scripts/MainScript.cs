@@ -21,7 +21,7 @@ public class MainScript : MonoBehaviour//Manage space objects
 
         GameObject sun = Instantiate(body);
         Body sunScript = sun.GetComponent<Body>();
-        sunScript.Initialize("Sun", 1400000, (float)1.989 * Mathf.Pow(10, 33), 0f, 0f, 2.66f * Mathf.Pow(10, -6));
+        sunScript.Initialize("Sun", 1400000, (float)1.989 * Mathf.Pow(10, 30), 0f, 0f, 2.66f * Mathf.Pow(10, -6));
 
         GameObject earth = Instantiate(body);
         Body earthScript = earth.GetComponent<Body>();
@@ -68,7 +68,7 @@ public class MainScript : MonoBehaviour//Manage space objects
         bodies.Add(moon);
         bodies.Add(sun);
         //earth.GetComponent<Rigidbody>().linearVelocity = new Vector3(1f, 1f, 1f);
-        focus = jupiter;
+        focus = earth;
 
         SimpleShipScript shipScript = ship.GetComponent<SimpleShipScript>();
         shipScript.SetPosition(new Vector3(13000,0,0));
@@ -115,7 +115,7 @@ public class MainScript : MonoBehaviour//Manage space objects
 
             map.GetComponent<MapDisplay>().SetFocus(focus, ship);
 
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(Parameters.GetUpdateTime());
         }
     }
 }

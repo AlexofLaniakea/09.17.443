@@ -5,6 +5,7 @@ public class SimpleShipScript : MonoBehaviour
 {
     private Rigidbody rb;
     private ConstantForce cf;
+    public StateIndicatorScript kinematicsDisplay;
     public float rotationSpeed = 100f;
     public float gravityMagnitude;
     public Vector3 gravityDirection;
@@ -13,34 +14,15 @@ public class SimpleShipScript : MonoBehaviour
     
     private float timeScale = 1f; //All velocities and accelerations should be multiplied by timescale
     
-    public float accelerationMagnitude = 0f;
-    public Vector3 accelerationDirection;
-
     //Physics scalars
-    public float mass = 1f;
     public float thrust= 0f;
 
     //3D kinematics variables. Stored in 1 unit = 1000 m
     private Vector3 position;
     private Vector3 velocity;
     private Vector3 acceleration;
-    
-
-    //Polar coordinate
-    private float distance;
-    private float azimuth;
-    private float elevation;
 
 
-    public void SetGravityForce(float gravityAcceleration, Vector3 vector){
-        gravityMagnitude = gravityAcceleration * mass;
-        gravityDirection = vector;
-    }
-
-    public void setTimeScale(float timeScale){
-        rb.linearVelocity = rb.linearVelocity * (timeScale/this.timeScale);
-        this.timeScale = timeScale;
-    }
 
     public void AddGravity(string name, Vector3 vector){
         foreach(GravityVector v in gravityVectors){
@@ -83,7 +65,7 @@ public class SimpleShipScript : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         cf = GetComponent<ConstantForce>();
         rb.sleepThreshold = 0.0f;
-        position = new Vector3(150000, 0f, 0f);
+        position = new Vector3(15000f, 0f, 0f);
     }
 
     // Update is called once per frame
@@ -111,30 +93,26 @@ public class SimpleShipScript : MonoBehaviour
         }
     }
 
-    void FixedUpdate(){
-        /*Vector3 gravityVector = gravityMagnitude * gravityDirection;
-        Vector3 accelerationVector = transform.forward.normalized * acceleration;
-        //Vector3 netForce = (accelerationVector + gravityVector) * Mathf.Pow(10, -3) * timeScale;
-        Vector3 netForce = accelerationVector;
-        foreach(GravityVector v in gravityVectors){
-            netForce += v.getVector();
-        }
-        cf.force = netForce * Mathf.Pow(10, -3) * Mathf.Pow(timeScale, 2);*/
-    }
-
-
     public void PhysicsClock(){
+        float updateTime = Parameters.GetUpdateTime();
+        float timeScale = Parameters.getTimeScale();
         acceleration = thrust * transform.forward.normalized;
-       foreach(GravityVector v in gravityVectors){
+        GravityVector strongestGravity = new GravityVector("None", new Vector3(0,0,0));
+        foreach(GravityVector v in gravityVectors){
             acceleration += v.getVector();
+            if(v.getVector().magnitude > strongestGravity.getVector().magnitude){
+                strongestGravity = v;
+            }
             //Debug.Log(v.getName() + " " + v.getVector().x);
         }
 
         //Change focus if another body has stronger gravity than the current focus
+        kinematicsDisplay.UpdateDisplay(acceleration.magnitude, velocity.magnitude, strongestGravity.getName());
+
 
         acceleration = acceleration * Mathf.Pow(timeScale, 2);
 
-        velocity += acceleration;
-        position += velocity;
+        velocity += acceleration * updateTime;
+        position += velocity * updateTime * timeScale;
     }
 }

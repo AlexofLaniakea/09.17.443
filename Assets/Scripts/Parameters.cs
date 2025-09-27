@@ -4,6 +4,7 @@ public class Parameters
 {
     private static float timeScale;
     private static float modelScale;
+    private static float updateTime = 0.05f;
 
     public static void setTimeScale(float ts)
     {
@@ -21,5 +22,14 @@ public class Parameters
 
     public static float GetModelScale(){
         return modelScale;
+    }
+
+    public static void SetUpdateTime(float ut)
+    {
+        updateTime = ut;
+    }
+
+    public static float GetUpdateTime(){
+        return updateTime;
     }
 }

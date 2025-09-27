@@ -125,6 +125,7 @@ public class Body : MonoBehaviour
         }
 
         float timeScale = Parameters.getTimeScale();
+        float updateTime = Parameters.GetUpdateTime();
         
 
         foreach(GameObject ship in ships){//Something wrong here
@@ -149,7 +150,7 @@ public class Body : MonoBehaviour
             float y = transform.position.y;
             float z = transform.position.z + satelliteDistance * Mathf.Sin(satelliteAngle);
             satellite.transform.position = new Vector3(x,y,z);
-            satelliteScript.SetAngle(satelliteAngle + satelliteAngularVelocity * timeScale);
+            satelliteScript.SetAngle(satelliteAngle + satelliteAngularVelocity * timeScale * Parameters.GetUpdateTime());
             satelliteScript.RenderSatellites();
             satellite.SetActive(true);
         }

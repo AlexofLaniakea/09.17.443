@@ -18,7 +18,6 @@ public class MapDisplay : MonoBehaviour
     void Start()
     {
         satellites = new List<GameObject>();
-
     }
 
     // Update is called once per frame
@@ -28,16 +27,17 @@ public class MapDisplay : MonoBehaviour
     }
 
     public void SetFocus(GameObject focus, GameObject ship){
+        if(satellites == null){
+            return;
+        }
         Body focusScript = focus.GetComponent<Body>();
         SimpleShipScript shipScript = ship.GetComponent<SimpleShipScript>();
 
 
         this.ship = ship;
 
-        if(satellites != null){
-            foreach(GameObject satellite in satellites){
-                Destroy(satellite);
-            }
+        foreach(GameObject satellite in satellites){
+            Destroy(satellite);
         }
         
         int satelliteCount = focusScript.GetSatellites().Count;
@@ -67,6 +67,9 @@ public class MapDisplay : MonoBehaviour
         position = position * mapWidth / 2;
         
         shipDot.GetComponent<RectTransform>().localPosition = position;
+        shipDot.GetComponent<RectTransform>().localEulerAngles = new Vector3(0, 0, -ship.transform.eulerAngles.y);
+
+
     }
 
     public void UpdateDisplay(){
