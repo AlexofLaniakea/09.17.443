@@ -68,10 +68,11 @@ public class MainScript : MonoBehaviour//Manage space objects
         bodies.Add(moon);
         bodies.Add(sun);
         //earth.GetComponent<Rigidbody>().linearVelocity = new Vector3(1f, 1f, 1f);
-        focus = earth;
+        focus = jupiter;
 
         SimpleShipScript shipScript = ship.GetComponent<SimpleShipScript>();
-        shipScript.SetPosition(new Vector3(13000,0,0));
+        shipScript.SetPosition(new Vector3(300000f,0,0));
+        shipScript.SetFocus(focus);
 
         StartCoroutine(ClockOneSecond());
     }
@@ -95,12 +96,12 @@ public class MainScript : MonoBehaviour//Manage space objects
 
             //Next render all planets relative to ship
             Vector3 shipPosition = shipScript.GetPosition();
+            focus = shipScript.GetFocus();
             focus.transform.position = shipPosition * -1;
             focus.SetActive(true);
             focus.GetComponent<Body>().RenderSatellites();
             if(focus.GetComponent<Body>().GetPrimary()){
                 focus.GetComponent<Body>().RenderPrimary();
-
             }
 
             //When gravity from satellite becomes greater than that of the focus, switch to satellite
