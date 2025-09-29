@@ -157,7 +157,7 @@ public class SimpleShipScript : MonoBehaviour
         
 
         //Change focus if another body has stronger gravity than the current focus
-        kinematicsDisplay.UpdateDisplay(acceleration.magnitude * 1000, velocity.magnitude * 1000, strongestGravity.getName());
+        kinematicsDisplay.UpdateDisplay(acceleration.magnitude * 1000, velocity.magnitude * 1000);
 
 
         acceleration = acceleration * Mathf.Pow(timeScale, 2);

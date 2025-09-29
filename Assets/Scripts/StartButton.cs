@@ -1,10 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ToggleMap : MonoBehaviour
+public class StartButton : MonoBehaviour
 {
     public Button button;
-    public GameObject display;
+    public GameObject startMenu;
+    public GameObject flightGUi;
+
 
      void Start()
     {
@@ -17,12 +19,8 @@ public class ToggleMap : MonoBehaviour
 
     void OnButtonClick()
     {
-        if(display.activeSelf){
-            display.SetActive(false);
-        }
-        else{
-            display.SetActive(true);
-        }
+        State.SetState(1);
+        startMenu.SetActive(false);
+        flightGUi.SetActive(true);
     }
 }
- 

@@ -6,69 +6,57 @@ using System.Collections;
 public class MainScript : MonoBehaviour//Manage space objects
 {
     public GameObject body;
+    public GameObject ship;
+    public GameObject map;
+    public TextAsset orbitFile;
+
     private float timeScale;
     private List<GameObject> bodies = new List<GameObject>();
-    public GameObject focus;
-    public GameObject core;
-    public GameObject ship;
+    private GameObject focus;
+    private GameObject core;
 
-    public GameObject map;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         //Constructor: Name, diameter, mass, distance from primary, initial angle, angular velocity
 
-        GameObject sun = Instantiate(body);
-        Body sunScript = sun.GetComponent<Body>();
-        sunScript.Initialize("Sun", 1400000, (float)1.989 * Mathf.Pow(10, 30), 0f, 0f, 2.66f * Mathf.Pow(10, -6));
+        //Read csv file
+        string csvContent = orbitFile.text;
 
-        GameObject earth = Instantiate(body);
-        Body earthScript = earth.GetComponent<Body>();
-        earthScript.Initialize("Earth", 12786, (float)5.972 * Mathf.Pow(10, 24), 150000000f, 0.39f, 2.66f * Mathf.Pow(10, -6));
-        sunScript.AddSatellite(earth);
+        string[] lines = csvContent.Split('\n');
 
-        GameObject jupiter = Instantiate(body);
-        Body jupiterScript = jupiter.GetComponent<Body>();
-        jupiterScript.Initialize("Jupiter", 139820, (float)1.898 * Mathf.Pow(10, 27), 773000000f, 0.106f, 1.67f * Mathf.Pow(10, -8));
-        bodies.Add(jupiter);
-        sunScript.AddSatellite(jupiter);
+        foreach(string line in lines)
+        {
+            string[] values = line.Split(',');
+            string name = values[0];
+            string primaryName = values[1];
+            float diameter = float.Parse(values[2]);
+            float mass = float.Parse(values[3]);
+            float distance = float.Parse(values[4]);
+            float startAngle = float.Parse(values[5]);
+            float time = float.Parse(values[6]);
 
-        GameObject io = Instantiate(body);
-        Body ioScript = io.GetComponent<Body>();
-        ioScript.Initialize("Io", 3643, 8.93f * Mathf.Pow(10, 22), 421700, 4.11f, 4.11f * Mathf.Pow(10, -5));
-        bodies.Add(io);
-        jupiterScript.AddSatellite(io);
+            float angularVelocity = 0f;
 
-        GameObject europa = Instantiate(body);
-        Body europaScript = europa.GetComponent<Body>();
-        europaScript.Initialize("Europa", 3122, (float)4.80 * Mathf.Pow(10, 22), 670900, 2.05f, 4.94f * Mathf.Pow(10, -5));
-        bodies.Add(europa);
-        jupiterScript.AddSatellite(europa);
+            if(time > 0f){
+                angularVelocity = 2*Mathf.PI/time;
+            }
 
-        GameObject ganymede = Instantiate(body);
-        Body ganymedeScript = ganymede.GetComponent<Body>();
-        ganymedeScript.Initialize("Ganymede", 5262, (float)1.48 * Mathf.Pow(10, 23), 1070000, 0f, 1.02f * Mathf.Pow(10, -5));
-        bodies.Add(ganymede);
-        jupiterScript.AddSatellite(ganymede);
+            GameObject newBody = Instantiate(body);
+            Body script = newBody.GetComponent<Body>();
+            script.Initialize(name, diameter, mass, distance, startAngle, angularVelocity);
+            foreach(GameObject b in bodies){
+                Body bScript = b.GetComponent<Body>();
+                if(bScript.GetName().Equals(primaryName)){
+                    bScript.AddSatellite(newBody);
+                    break;
+                }
+            }
+            bodies.Add(newBody);
+        }
 
-        GameObject callisto = Instantiate(body);
-        Body callistoScript = callisto.GetComponent<Body>();
-        callistoScript.Initialize("Callisto", 4821, 1.08f * Mathf.Pow(10, 23), 1883000, 5.10f, 4.36f * Mathf.Pow(10, -6));
-        bodies.Add(callisto);
-        jupiterScript.AddSatellite(callisto);
-
-
-        GameObject moon = Instantiate(body);
-        Body moonScript = moon.GetComponent<Body>();
-        moonScript.Initialize("Moon", 3474, (float)7.348 * Mathf.Pow(10, 22), 348400f, 0f, 2.66f * Mathf.Pow(10, -6));
-
-        earthScript.AddSatellite(moon);
-        bodies.Add(earth);
-        bodies.Add(moon);
-        bodies.Add(sun);
-        //earth.GetComponent<Rigidbody>().linearVelocity = new Vector3(1f, 1f, 1f);
-        focus = jupiter;
+        focus = bodies[3];
 
         SimpleShipScript shipScript = ship.GetComponent<SimpleShipScript>();
         shipScript.SetPosition(new Vector3(300000f,0,0));
@@ -87,6 +75,9 @@ public class MainScript : MonoBehaviour//Manage space objects
     {
         while(true)
         {
+            while(State.GetState() != 1){
+                yield return new WaitForSeconds(0.1f);
+            }
             /*focus.transform.position = new Vector3(0f,0f,0f);
             focus.GetComponent<Body>().RenderSatellites();
             focus.SetActive(true);*/

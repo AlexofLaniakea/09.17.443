@@ -78,13 +78,17 @@ public class Body : MonoBehaviour
         Body satelliteScript = satellite.GetComponent<Body>();
         
         satellite.GetComponent<Body>().SetPrimary(gb);
-        if(satelliteScript.GetDistance() * 2f > systemRadius){
-            systemRadius = satelliteScript.GetDistance() * 2f;
+        if(satelliteScript.GetDistance() * 1.25f > systemRadius){
+            systemRadius = satelliteScript.GetDistance() * 1.25f;
         }
     }
 
     public void SetPrimary(GameObject primary){
         this.primary = primary;
+    }
+
+    public string GetName(){
+        return name;
     }
 
     public float GetAngularVelocity(){
