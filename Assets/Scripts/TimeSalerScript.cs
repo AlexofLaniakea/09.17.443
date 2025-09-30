@@ -1,8 +1,12 @@
 using UnityEngine;
-using UnityEngine.UI; // needed for Slider
+using UnityEngine.UI;
+using TMPro;
 
 public class TimeScalerScript : MonoBehaviour
 {
+
+    public TMP_Text textMeshPro;  
+
     private GameObject ship;
     private SimpleShipScript script;
     public Slider slider;
@@ -26,6 +30,8 @@ public class TimeScalerScript : MonoBehaviour
     private void OnSliderChanged(float value)
     {
         timeScale = value * 999f + 1f;
-        //Change this to logarithmic scale probably
+
+        textMeshPro.text = "Time:\n"+timeScale+"x";
+
     }
 }

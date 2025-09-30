@@ -121,9 +121,12 @@ public class MapDisplay : MonoBehaviour
             if(satellite == null){ continue; }
             Vector3 offset = satellite.GetComponent<RectTransform>().localPosition - shipDot.GetComponent<RectTransform>().localPosition;
             satellite.transform.GetComponent<RectTransform>().localPosition = shipDot.GetComponent<RectTransform>().localPosition + offset * zoom;
+            satellite.SetActive(true);
         }
 
-
+        //Move center
+        Vector2 centerPosition = -1f * position * (zoom - 1.0f);
+        center.GetComponent<RectTransform>().localPosition = centerPosition;
 
         //Create graph
         position = new Vector2(shipScript.GetPosition().x, shipScript.GetPosition().z);

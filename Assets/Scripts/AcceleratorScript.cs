@@ -1,8 +1,11 @@
 using UnityEngine;
-using UnityEngine.UI; // needed for Slider
+using UnityEngine.UI;
+using TMPro;
 
 public class AcceleratorScript : MonoBehaviour
 {
+    public TMP_Text textMeshPro;  
+
     private GameObject ship;
     private SimpleShipScript script;
     public Slider slider;
@@ -26,5 +29,6 @@ public class AcceleratorScript : MonoBehaviour
     private void OnSliderChanged(float value)
     {
         acceleration = value * Mathf.Pow(10, -2);
+        textMeshPro.text = "Thrust:\n"+acceleration * 1000f+"m/s^2";
     }
 }
