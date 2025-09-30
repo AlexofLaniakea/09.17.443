@@ -59,7 +59,7 @@ public class MainScript : MonoBehaviour//Manage space objects
         focus = bodies[3];
 
         SimpleShipScript shipScript = ship.GetComponent<SimpleShipScript>();
-        shipScript.SetPosition(new Vector3(300000f,0,0));
+        shipScript.SetPosition(new Vector3(30000f,0,0));
         shipScript.SetFocus(focus);
 
         StartCoroutine(ClockOneSecond());

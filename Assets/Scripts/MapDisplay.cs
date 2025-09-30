@@ -16,7 +16,19 @@ public class MapDisplay : MonoBehaviour
     float mapWidth = 300f;
 
     private GameObject ship;
+    private float zoom = 1f;
     List<GameObject> satellites;
+
+    public void ZoomIn(){
+        zoom *= 1.1f;
+    }
+
+    public void ZoomOut(){
+        if(zoom > 1f){
+            zoom /= 1.1f;
+
+        }
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -103,6 +115,15 @@ public class MapDisplay : MonoBehaviour
       
         shipDot.GetComponent<RectTransform>().localPosition = position;
         shipDot.GetComponent<RectTransform>().localEulerAngles = new Vector3(0, 0, -ship.transform.eulerAngles.y);
+
+        //Move the satellite objects to a further position based on the zoom level
+        foreach(GameObject satellite in satellites){
+            if(satellite == null){ continue; }
+            Vector3 offset = satellite.GetComponent<RectTransform>().localPosition - shipDot.GetComponent<RectTransform>().localPosition;
+            satellite.transform.GetComponent<RectTransform>().localPosition = shipDot.GetComponent<RectTransform>().localPosition + offset * zoom;
+        }
+
+
 
         //Create graph
         position = new Vector2(shipScript.GetPosition().x, shipScript.GetPosition().z);

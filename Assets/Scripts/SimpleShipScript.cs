@@ -160,7 +160,7 @@ public class SimpleShipScript : MonoBehaviour
         kinematicsDisplay.UpdateDisplay(acceleration.magnitude * 1000, velocity.magnitude * 1000);
 
 
-        acceleration = acceleration * Mathf.Pow(timeScale, 2);
+        acceleration = acceleration * Mathf.Pow(timeScale, 1f);
 
         velocity += acceleration * updateTime;
         position += velocity * updateTime * timeScale;
