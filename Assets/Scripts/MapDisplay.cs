@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class MapDisplay : MonoBehaviour
 {
     public GameObject gb;
-    public Image spriteRenderer;
+    public RawImage spriteRenderer;
     public Texture2D texture;
 
 
@@ -13,7 +13,7 @@ public class MapDisplay : MonoBehaviour
     public GameObject satellitePrefab;
     public GameObject center;
 
-    float mapWidth = 300f;
+    float mapWidth = 225f;
 
     private GameObject ship;
     private float zoom = 1f;
@@ -33,34 +33,7 @@ public class MapDisplay : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        spriteRenderer = GetComponent<Image>();
-
-        // ✅ Create a new texture for drawing
-        texture = new Texture2D(300, 300, TextureFormat.RGBA32, false);
-        texture.filterMode = FilterMode.Point;
-
-        // Fill background black
-        Color[] fill = new Color[texture.width * texture.height];
-        for (int i = 0; i < fill.Length; i++) fill[i] = Color.black;
-        texture.SetPixels(fill);
-
-        // Example: draw a vertical white line
-        for (int i = 0; i < texture.height; i++)
-        {
-            texture.SetPixel(100, i, Color.white);
-        }
-
-        texture.Apply();
-
-        // ✅ Wrap in a Sprite and assign to UI Image
-        Sprite sprite = Sprite.Create(
-            texture,
-            new Rect(0, 0, texture.width, texture.height),
-            new Vector2(0.5f, 0.5f),
-            100f
-        );
-
-        spriteRenderer.sprite = sprite;
+        
 
         satellites = new List<GameObject>();
     }
@@ -129,41 +102,52 @@ public class MapDisplay : MonoBehaviour
         center.GetComponent<RectTransform>().localPosition = centerPosition;
 
         //Create graph
-        position = new Vector2(shipScript.GetPosition().x, shipScript.GetPosition().z);
-        Vector2 velocity = new Vector2(shipScript.GetVelocity().x, shipScript.GetVelocity().z);
-        
-        float pMag= position.magnitude;
-        float vMag = velocity.magnitude;
-        float mu = focusScript.GetMass() * 6.67f*Mathf.Pow(10f,-11f);
+        radius *= 1000f;
 
-        float h= position.x * velocity.y - position.y * velocity.x;
-        Vector2 eVector = (1f/mu)*((Mathf.Pow(vMag,2)-mu/pMag)*position-Vector2.Dot(position,velocity)*velocity);
-        float e = eVector.magnitude;
+        Vector2 r0_vec = new Vector2(shipScript.GetPosition().x, shipScript.GetPosition().z) * 1000f;
+        Vector2 v0_vec = new Vector2(shipScript.GetVelocity().x, shipScript.GetVelocity().z) * 1000f;
+        float x0 = r0_vec.x;
+        float y0 = r0_vec.y;
+        float vx0 = v0_vec.x;
+        float vy0 = v0_vec.y;
+        float rv_dot = Vector2.Dot(r0_vec,v0_vec);
 
-        float semiMaj = (vMag*vMag)/2f - mu/pMag;
+        float G = 6.67f * Mathf.Pow(10f,-11f);
+        float mass = focusScript.GetMass();
+        float mu = G*mass;
 
-        float a = -mu/(2f*semiMaj);
+        float r0 = r0_vec.magnitude;
+        float v0 = v0_vec.magnitude;
 
-        for (int i = 0; i < texture.height; i++)
-        {
-            for(int j = 0; j < texture.width; j++){
-                texture.SetPixel(j, i, Color.black);
+        float h = x0*vy0-y0*vx0;
+
+        Vector2 e_vec = (1/mu)*((v0*v0-mu/r0)*r0_vec-rv_dot*v0_vec);
+        float e = e_vec.magnitude;
+
+        float epsilon = v0*v0/2-mu/r0;
+
+        float omega = Mathf.Atan2(e_vec[1],e_vec[0]);
+
+        float p = h*h/mu;
+
+        for(int i = 0; i < 300; i++){
+            for(int j = 0; j < 300; j++){
+                texture.SetPixel(i, j, Color.black);
             }
         }
 
-        float omega = Mathf.Atan2(eVector.y, eVector.x);
-        for(float i = 0; i < 2*Mathf.PI; i+=Mathf.PI/100){
-            //Plot graph for each angle
-            float r = (h*h/mu) / (1f + e * Mathf.Cos(i - omega));
-            float scale = mapWidth / (2f * (float)(a * (1 + e))); // roughly size orbit to screen
-            int x = (int)(r * Mathf.Cos(i) + mapWidth/2);
-            int y = (int)(r * Mathf.Sin(i) + mapWidth/2);
-            //Debug.Log(x+","+y);
-            texture.SetPixel(x,y, Color.white);
+        float rTest =  p/(1+e*Mathf.Cos(Mathf.PI - omega));
+
+        for(float theta = 0f; theta < 2*Mathf.PI; theta+=Mathf.PI/500){
+            float r_theta = p/(1+e*Mathf.Cos(theta-omega));
+            float rx = r_theta * Mathf.Cos(theta);
+            float ry = r_theta * Mathf.Sin(theta);
+            //rx/radius + scale / 2;
+            float graphx = rx / radius*mapWidth/2 + mapWidth / 2f;
+            float graphy = ry / radius*mapWidth/2 + mapWidth / 2f;
+            texture.SetPixel((int)graphx, (int)graphy, Color.white);
         }
-        for(int i = 0; i < 150; i++){
-            texture.SetPixel(100,i,Color.white);
-        }
+    
         texture.Apply();
 
     }   

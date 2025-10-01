@@ -49,6 +49,10 @@ public class SimpleShipScript : MonoBehaviour
         this.position = position;
     }
 
+    public void SetVelocity(Vector3 velocity){
+        this.velocity = velocity;
+    }
+
     public void SetFocus(GameObject focus){
         this.focus = focus;
     }
