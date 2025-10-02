@@ -33,8 +33,6 @@ public class MapDisplay : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
-
         satellites = new List<GameObject>();
     }
 
@@ -136,16 +134,33 @@ public class MapDisplay : MonoBehaviour
             }
         }
 
-        float rTest =  p/(1+e*Mathf.Cos(Mathf.PI - omega));
+        float lowerBound;
+        float upperBound;
 
-        for(float theta = 0f; theta < 2*Mathf.PI; theta+=Mathf.PI/500){
+        //Debug.Log(omega);
+
+
+        if(e > 1f){
+            float bound = Mathf.Acos(-1/e);
+            //Only count from -pi/2 to pi/2
+            lowerBound = omega -1f * bound;
+            //upperBound = omega + Mathf.PI/2;
+            upperBound = omega + bound;
+        }else{
+            lowerBound = 0f;
+            upperBound = 2f * Mathf.PI;
+        }
+
+        for(float theta = lowerBound; theta < upperBound; theta+=Mathf.PI/500){
             float r_theta = p/(1+e*Mathf.Cos(theta-omega));
             float rx = r_theta * Mathf.Cos(theta);
             float ry = r_theta * Mathf.Sin(theta);
             //rx/radius + scale / 2;
             float graphx = rx / radius*mapWidth/2 + mapWidth / 2f;
             float graphy = ry / radius*mapWidth/2 + mapWidth / 2f;
-            texture.SetPixel((int)graphx, (int)graphy, Color.white);
+            if(graphx <= mapWidth && graphy <= mapWidth && graphx >= 0 && graphy >= 0){
+                texture.SetPixel((int)graphx, (int)graphy, Color.white);
+            }
         }
     
         texture.Apply();
