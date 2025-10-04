@@ -8,6 +8,7 @@ public class MainScript : MonoBehaviour//Manage space objects
     public GameObject body;
     public GameObject ship;
     public GameObject map;
+    public GameObject spawnButton;
     public TextAsset orbitFile;
 
     private float timeScale;
@@ -56,12 +57,21 @@ public class MainScript : MonoBehaviour//Manage space objects
             bodies.Add(newBody);
         }
 
-        focus = bodies[5];
+        focus = bodies[0];
 
         SimpleShipScript shipScript = ship.GetComponent<SimpleShipScript>();
-        shipScript.SetPosition(new Vector3(0,0,300000f));
+        shipScript.SetPosition(new Vector3(0,0,300000));
         shipScript.SetFocus(focus);
 
+        
+        //Make two rows of four buttons each. GUI width is 300 from the center
+        for (int i = 0; i < 2; i++){
+            for (int j = 0; j < 4; j++){
+                GameObject newSpawnButton = Instantiate(spawnButton);
+                SpawnButton buttonScript = newSpawnButton.GetComponent<SpawnButton>();
+                buttonScript.Initialize(bodies[i*4+j+1], new Vector2(j*160-240,i*-100f));
+            }
+        }
         StartCoroutine(ClockOneSecond());
     }
 

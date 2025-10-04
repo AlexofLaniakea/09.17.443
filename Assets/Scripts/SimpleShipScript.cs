@@ -100,7 +100,7 @@ public class SimpleShipScript : MonoBehaviour
         {
             transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);            
         }
-        if (Input.GetKey(KeyCode.W))
+        /*if (Input.GetKey(KeyCode.W))
         {
             transform.Rotate(Vector3.right, -rotationSpeed * Time.deltaTime);
         }
@@ -109,7 +109,7 @@ public class SimpleShipScript : MonoBehaviour
         if (Input.GetKey(KeyCode.S))
         {
             transform.Rotate(Vector3.right, rotationSpeed * Time.deltaTime);            
-        }
+        }*/
     }
 
     public void PhysicsClock(){

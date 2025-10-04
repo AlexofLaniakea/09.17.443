@@ -99,6 +99,16 @@ public class MapDisplay : MonoBehaviour
         Vector2 centerPosition = -1f * position * (zoom - 1.0f);
         center.GetComponent<RectTransform>().localPosition = centerPosition;
 
+        for(int i = 0; i < 300; i++){
+            for(int j = 0; j < 300; j++){
+                texture.SetPixel(i, j, Color.black);
+            }
+        }
+        if(zoom >= 1.1f){
+            texture.Apply();
+            return;
+        }
+
         //Create graph
         radius *= 1000f;
 
@@ -128,17 +138,8 @@ public class MapDisplay : MonoBehaviour
 
         float p = h*h/mu;
 
-        for(int i = 0; i < 300; i++){
-            for(int j = 0; j < 300; j++){
-                texture.SetPixel(i, j, Color.black);
-            }
-        }
-
         float lowerBound;
         float upperBound;
-
-        //Debug.Log(omega);
-
 
         if(e > 1f){
             float bound = Mathf.Acos(-1/e);
