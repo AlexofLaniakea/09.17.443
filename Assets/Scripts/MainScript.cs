@@ -12,6 +12,7 @@ public class MainScript : MonoBehaviour//Manage space objects
     public TextAsset orbitFile;
 
     private float timeScale;
+    private float modelScale;
     private List<GameObject> bodies = new List<GameObject>();
     private GameObject focus;
     private GameObject core;
@@ -26,15 +27,16 @@ public class MainScript : MonoBehaviour//Manage space objects
         string csvContent = orbitFile.text;
 
         string[] lines = csvContent.Split('\n');
+        modelScale = Parameters.GetModelScale();
 
         foreach(string line in lines)
         {
             string[] values = line.Split(',');
             string name = values[0];
             string primaryName = values[1];
-            float diameter = float.Parse(values[2]);
+            float diameter = float.Parse(values[2])*1000f/modelScale;
             float mass = float.Parse(values[3]);
-            float distance = float.Parse(values[4]);
+            float distance = float.Parse(values[4])*1000f/modelScale;
             float startAngle = float.Parse(values[5]);
             float time = float.Parse(values[6]);
 
@@ -57,11 +59,8 @@ public class MainScript : MonoBehaviour//Manage space objects
             bodies.Add(newBody);
         }
 
-        focus = bodies[0];
 
-        SimpleShipScript shipScript = ship.GetComponent<SimpleShipScript>();
-        shipScript.SetPosition(new Vector3(0,0,300000));
-        shipScript.SetFocus(focus);
+        //SimpleShipScript shipScript = ship.GetComponent<SimpleShipScript>();
 
         
         //Make two rows of four buttons each. GUI width is 300 from the center
@@ -81,6 +80,22 @@ public class MainScript : MonoBehaviour//Manage space objects
         
     }
 
+    public void Render(GameObject focus, Vector3 position)
+    {
+            //Next render all planets relative to ship
+        Vector3 shipPosition = position;
+        focus.transform.position = shipPosition * -1;
+        focus.SetActive(true);
+        focus.GetComponent<Body>().RenderSatellites();
+        if(focus.GetComponent<Body>().GetPrimary()){
+            focus.GetComponent<Body>().RenderPrimary();
+        }
+
+        foreach(GameObject body in bodies){
+            body.GetComponent<Body>().SetSkyPoint((body.transform.position).normalized * 100f);
+        }
+    }
+
     IEnumerator ClockOneSecond()
     {
         while(true)
@@ -88,34 +103,11 @@ public class MainScript : MonoBehaviour//Manage space objects
             while(State.GetState() != 1){
                 yield return new WaitForSeconds(0.1f);
             }
-            /*focus.transform.position = new Vector3(0f,0f,0f);
-            focus.GetComponent<Body>().RenderSatellites();
-            focus.SetActive(true);*/
 
-            SimpleShipScript shipScript = ship.GetComponent<SimpleShipScript>();
-
-
-            //Next render all planets relative to ship
-            Vector3 shipPosition = shipScript.GetPosition();
-            focus = shipScript.GetFocus();
-            focus.transform.position = shipPosition * -1;
-            focus.SetActive(true);
-            focus.GetComponent<Body>().RenderSatellites();
-            if(focus.GetComponent<Body>().GetPrimary()){
-                focus.GetComponent<Body>().RenderPrimary();
-            }
-
-            //When gravity from satellite becomes greater than that of the focus, switch to satellite
-            //When gravity from primary becomes greater than that of the focus, switch to primary
-
-            //Manage 2D render thing???
-        
-            shipScript.PhysicsClock();
             foreach(GameObject body in bodies){
                 body.GetComponent<Body>().PhysicsClock();
             }
-
-            map.GetComponent<MapDisplay>().SetFocus(focus, ship);
+    
 
             yield return new WaitForSeconds(Parameters.GetUpdateTime());
         }

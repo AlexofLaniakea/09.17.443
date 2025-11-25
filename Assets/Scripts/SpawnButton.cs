@@ -11,6 +11,7 @@ public class SpawnButton : MonoBehaviour
     public GameObject gb;
     public GameObject startMenu;
     public GameObject flightGUi;
+    public GameObject planetSelection;
 
 
     private GameObject body;
@@ -20,7 +21,7 @@ public class SpawnButton : MonoBehaviour
         this.body = body;
 
         gb.SetActive(true);
-        gb.transform.SetParent(GameObject.Find("StartMenu").transform);
+        gb.transform.SetParent(planetSelection.transform);
         gb.GetComponent<RectTransform>().localPosition = position;
         Body bodyScript = body.GetComponent<Body>();
 

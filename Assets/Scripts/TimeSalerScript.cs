@@ -29,7 +29,7 @@ public class TimeScalerScript : MonoBehaviour
     // Called whenever the slider moves
     private void OnSliderChanged(float value)
     {
-        timeScale = value * 999f + 1f;
+        timeScale = Mathf.Pow(10, value * 5f);;
 
         textMeshPro.text = "Time:\n"+timeScale+"x";
 

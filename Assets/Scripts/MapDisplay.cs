@@ -55,6 +55,8 @@ public class MapDisplay : MonoBehaviour
         foreach(GameObject satellite in satellites){
             Destroy(satellite);
         }
+
+        satellites = new List<GameObject>();
         
         int satelliteCount = focusScript.GetSatellites().Count;
 
@@ -104,16 +106,17 @@ public class MapDisplay : MonoBehaviour
                 texture.SetPixel(i, j, Color.black);
             }
         }
-        if(zoom >= 1.1f){
+        if(false && zoom >= 1.1f){
             texture.Apply();
             return;
         }
 
         //Create graph
-        radius *= 1000f;
+        float modelScale = Parameters.GetModelScale();
+        radius *= modelScale;
 
-        Vector2 r0_vec = new Vector2(shipScript.GetPosition().x, shipScript.GetPosition().z) * 1000f;
-        Vector2 v0_vec = new Vector2(shipScript.GetVelocity().x, shipScript.GetVelocity().z) * 1000f;
+        Vector2 r0_vec = new Vector2(shipScript.GetPosition().x, shipScript.GetPosition().z)*modelScale;
+        Vector2 v0_vec = new Vector2(shipScript.GetVelocity().x, shipScript.GetVelocity().z)*modelScale;
         float x0 = r0_vec.x;
         float y0 = r0_vec.y;
         float vx0 = v0_vec.x;
@@ -152,15 +155,40 @@ public class MapDisplay : MonoBehaviour
             upperBound = 2f * Mathf.PI;
         }
 
+        float centerX = centerPosition.x;
+        float centerY = centerPosition.y;
+
+        float graphRadius = radius * mapWidth / 2;
+
         for(float theta = lowerBound; theta < upperBound; theta+=Mathf.PI/500){
-            float r_theta = p/(1+e*Mathf.Cos(theta-omega));
-            float rx = r_theta * Mathf.Cos(theta);
-            float ry = r_theta * Mathf.Sin(theta);
+            float r_world = p/(1+e*Mathf.Cos(theta-omega)) * zoom;
+            float r_graph = r_world/graphRadius * zoom;
+            float rx = r_world * Mathf.Cos(theta);
+            float ry = r_world * Mathf.Sin(theta);
+            float cartx = rx / radius*mapWidth/2;
+            float carty = ry / radius*mapWidth/2;
             //rx/radius + scale / 2;
-            float graphx = rx / radius*mapWidth/2 + mapWidth / 2f;
-            float graphy = ry / radius*mapWidth/2 + mapWidth / 2f;
+            float graphx = (rx / radius*mapWidth/2 + mapWidth / 2f) + centerX;
+            float graphy = (ry / radius*mapWidth/2 + mapWidth / 2f) + centerY;
             if(graphx <= mapWidth && graphy <= mapWidth && graphx >= 0 && graphy >= 0){
                 texture.SetPixel((int)graphx, (int)graphy, Color.white);
+            }
+        }
+        foreach(GameObject satellite in satellites)
+        {
+            //Using centerX and centerY plot a circle
+            if(satellite == null){ continue; }
+            Vector2 satellitePosition = satellite.GetComponent<RectTransform>().localPosition;
+            float distance = Vector2.Distance(satellitePosition,centerPosition);
+            for(float theta = lowerBound; theta < upperBound; theta+=Mathf.PI/500){
+                float rx = distance * Mathf.Cos(theta);
+                float ry = distance * Mathf.Sin(theta);
+                //rx/radius + scale / 2;
+                float graphx = (rx + mapWidth / 2f) + centerX;
+                float graphy = (ry + mapWidth / 2f) + centerY;
+                if(graphx <= mapWidth && graphy <= mapWidth && graphx >= 0 && graphy >= 0){
+                    texture.SetPixel((int)graphx, (int)graphy, Color.white);
+                }
             }
         }
     

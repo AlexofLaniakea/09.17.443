@@ -5,6 +5,8 @@ using System.Collections.Generic;
 public class Body : MonoBehaviour
 {
     private GameObject gb;
+    private GameObject skyPoint;
+
     private string name;
     private float mass; //(float)5.972 * Mathf.Pow(10, 24);
     private GameObject shipsListObject;
@@ -57,8 +59,11 @@ public class Body : MonoBehaviour
             ships.Add(child.gameObject);
         }
 
-        gb = this.gameObject;
+        skyPoint = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        Destroy(skyPoint.GetComponent<Collider>());        
+        //skyPoint.transform.localScale *= 10f;
 
+        gb = this.gameObject;
     }
 
     public void SetAngularVelocity(float angularVelocity){
@@ -125,14 +130,20 @@ public class Body : MonoBehaviour
 
     public GravityVector GetGravity(GameObject ship)
     {
-        float distance = Vector3.Distance(transform.position, ship.transform.position) * 1000f;
-        float acceleration =  G * mass / Mathf.Pow(distance, 2) * Mathf.Pow(10, -3);
+        float modelScale = Parameters.GetModelScale();
+        float distance = Vector3.Distance(transform.position, ship.transform.position) * modelScale;
+        float acceleration =  G * mass / Mathf.Pow(distance, 2) * 1/modelScale;
         Vector3 offset = transform.position - ship.transform.position;
         offset = offset.normalized;
 
         return new GravityVector(name, acceleration * offset);
         /*SimpleShipScript simpleShipScript = ship.GetComponent<SimpleShipScript>();
         simpleShipScript.AddGravity(name, acceleration * offset);   */     
+    }
+
+    public void SetSkyPoint(Vector3 position)
+    {
+        skyPoint.transform.position = position;
     }
 
     void FixedUpdate()

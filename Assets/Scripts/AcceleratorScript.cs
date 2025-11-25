@@ -28,7 +28,7 @@ public class AcceleratorScript : MonoBehaviour
     // Called whenever the slider moves
     private void OnSliderChanged(float value)
     {
-        acceleration = value * Mathf.Pow(10, -2);
-        textMeshPro.text = "Thrust:\n"+acceleration * 1000f+"m/s^2";
+        acceleration = value * 10f/Parameters.GetModelScale();
+        textMeshPro.text = "Thrust:\n"+acceleration*1000f+"m/s^2";
     }
 }
