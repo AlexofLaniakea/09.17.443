@@ -4,7 +4,7 @@ public class Parameters
 {
     private static float timeScale;
     private static float modelScale = 10000f;//Meters
-    private static float updateTime = 0.05f;
+    private static float updateTime = 0.02f;
 
     public static void setTimeScale(float ts)
     {

@@ -59,8 +59,8 @@ public class Body : MonoBehaviour
             ships.Add(child.gameObject);
         }
 
-        skyPoint = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        Destroy(skyPoint.GetComponent<Collider>());        
+        //skyPoint = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        //Destroy(skyPoint.GetComponent<Collider>());        
         //skyPoint.transform.localScale *= 10f;
 
         gb = this.gameObject;

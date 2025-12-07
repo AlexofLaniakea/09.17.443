@@ -16,8 +16,7 @@ public class MainScript : MonoBehaviour//Manage space objects
     private List<GameObject> bodies = new List<GameObject>();
     private GameObject focus;
     private GameObject core;
-
-
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -71,7 +70,6 @@ public class MainScript : MonoBehaviour//Manage space objects
                 buttonScript.Initialize(bodies[i*4+j+1], new Vector2(j*160-240,i*-100f));
             }
         }
-        StartCoroutine(ClockOneSecond());
     }
 
     // Update is called once per frame
@@ -86,30 +84,21 @@ public class MainScript : MonoBehaviour//Manage space objects
         Vector3 shipPosition = position;
         focus.transform.position = shipPosition * -1;
         focus.SetActive(true);
-        focus.GetComponent<Body>().RenderSatellites();
+        //focus.GetComponent<Body>().RenderSatellites();
         if(focus.GetComponent<Body>().GetPrimary()){
             focus.GetComponent<Body>().RenderPrimary();
         }
+        else{
+            focus.GetComponent<Body>().RenderSatellites();
+        }
 
         foreach(GameObject body in bodies){
-            body.GetComponent<Body>().SetSkyPoint((body.transform.position).normalized * 100f);
+           // body.GetComponent<Body>().SetSkyPoint((body.transform.position).normalized * 100f);
+        }
+
+        foreach(GameObject body in bodies){
+            body.GetComponent<Body>().PhysicsClock();
         }
     }
 
-    IEnumerator ClockOneSecond()
-    {
-        while(true)
-        {
-            while(State.GetState() != 1){
-                yield return new WaitForSeconds(0.1f);
-            }
-
-            foreach(GameObject body in bodies){
-                body.GetComponent<Body>().PhysicsClock();
-            }
-    
-
-            yield return new WaitForSeconds(Parameters.GetUpdateTime());
-        }
-    }
 }
