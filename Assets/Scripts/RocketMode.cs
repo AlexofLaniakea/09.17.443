@@ -24,6 +24,7 @@ public class RocketMode : MonoBehaviour
 
         SpawnSelectionUI.SetActive(true);
         cameraModeUI.SetActive(false);
+        //SpawnButton.SetShip(ship);
     }
     
 }

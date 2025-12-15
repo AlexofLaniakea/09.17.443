@@ -6,8 +6,8 @@ public class SpawnButton : MonoBehaviour
 {
     public TMP_Text textMeshPro;  
  
-    public Button button;
     public GameObject ship;
+    public Button button;
     public GameObject gb;
     public GameObject startMenu;
     public GameObject flightGUi;
@@ -29,6 +29,7 @@ public class SpawnButton : MonoBehaviour
         //button.onClick.AddListener(OnButtonClick);
     }
 
+
     void Start()
     {
         if (button != null)
@@ -49,4 +50,5 @@ public class SpawnButton : MonoBehaviour
         startMenu.SetActive(false);
         flightGUi.SetActive(true);
     }
+
 }

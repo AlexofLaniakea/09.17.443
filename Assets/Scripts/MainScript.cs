@@ -84,6 +84,7 @@ public class MainScript : MonoBehaviour//Manage space objects
         Vector3 shipPosition = position;
         focus.transform.position = shipPosition * -1;
         focus.SetActive(true);
+
         //focus.GetComponent<Body>().RenderSatellites();
         if(focus.GetComponent<Body>().GetPrimary()){
             focus.GetComponent<Body>().RenderPrimary();

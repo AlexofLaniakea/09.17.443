@@ -6,10 +6,13 @@ public class SimpleShipScript : MonoBehaviour
 {
     public GameObject gb;
     public GameObject main;
-    public GameObject focus;
     public GameObject map;
+    public GameObject accelerator;
+    public GameObject camera;
 
-    private MainScript mainScript;
+    protected MainScript mainScript;
+
+    private GameObject focus;
 
     private Rigidbody rb;
     private ConstantForce cf;
@@ -24,9 +27,9 @@ public class SimpleShipScript : MonoBehaviour
     private float timeScale = 1f; //All velocities and accelerations should be multiplied by timescale
     
     //Physics scalars
-    public float thrust= 0f;
-    public float right = 0;
-    public float forward = 0;
+    protected float thrust= 0f;
+    private float right = 0;
+    private float forward = 0;
 
     //3D kinematics variables. Stored in 1 unit = 1000 m
     private Vector3 position;
@@ -34,7 +37,7 @@ public class SimpleShipScript : MonoBehaviour
     private Vector3 acceleration;
 
     //Control parameters
-    private bool isFreeCam = true;
+    private bool isFreeCam = false;
 
     public void AddGravity(string name, Vector3 vector){
         foreach(GravityVector v in gravityVectors){
@@ -50,7 +53,8 @@ public class SimpleShipScript : MonoBehaviour
 
     }
 
-    public void SetThrust(float thrust){
+    public virtual void SetThrust(float thrust){
+        Debug.Log("SetThrustSimple");
         this.thrust = thrust;
     }
 
@@ -95,10 +99,6 @@ public class SimpleShipScript : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        cf = GetComponent<ConstantForce>();
-        rb.sleepThreshold = 0.0f;
-
         mainScript = main.GetComponent<MainScript>();
         StartCoroutine(ClockOneSecond());
         //position = new Vector3(150000000f, 0f, 30000f);
@@ -117,6 +117,8 @@ public class SimpleShipScript : MonoBehaviour
         {
             transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);            
         }
+
+        SetThrust(accelerator.GetComponent<AcceleratorScript>().GetValue());
         /*if (Input.GetKey(KeyCode.W))
         {
             transform.Rotate(Vector3.right, -rotationSpeed * Time.deltaTime);
@@ -127,6 +129,84 @@ public class SimpleShipScript : MonoBehaviour
         {
             transform.Rotate(Vector3.right, rotationSpeed * Time.deltaTime);            
         }*/
+        if (Input.GetKey(KeyCode.I)){//Move camera in
+            camera.transform.position -= camera.transform.position.normalized;
+
+            //set angle to offset
+            Vector3 offset = camera.transform.position-gb.transform.position;
+            offset=offset.normalized*-1;
+            camera.transform.rotation = Quaternion.LookRotation(offset);
+        }
+        if (Input.GetKey(KeyCode.O)){//Move camera out
+            camera.transform.position += camera.transform.position.normalized;
+
+            //set angle to offset
+            Vector3 offset = camera.transform.position-gb.transform.position;
+            offset=offset.normalized*-1;
+            camera.transform.rotation = Quaternion.LookRotation(offset);
+        }
+
+        if(Input.GetKey(KeyCode.LeftArrow)){
+            float x = camera.transform.position.x;
+            float y = camera.transform.position.z;
+            float z = camera.transform.position.y;
+            float theta = 0.01f;
+
+            float xNew = x*Mathf.Cos(theta)-y*Mathf.Sin(theta);
+            float yNew = x*Mathf.Sin(theta)+y*Mathf.Cos(theta);
+            camera.transform.position=new Vector3(xNew,z,yNew);
+
+            //set angle to offset
+            Vector3 offset = camera.transform.position-gb.transform.position;
+            offset=offset.normalized*-1;
+            camera.transform.rotation = Quaternion.LookRotation(offset);
+        }
+        if(Input.GetKey(KeyCode.RightArrow)){
+            float x = camera.transform.position.x;
+            float y = camera.transform.position.z;
+            float z = camera.transform.position.y;
+            float theta = -0.01f;
+            
+            float xNew = x*Mathf.Cos(theta)-y*Mathf.Sin(theta);
+            float yNew = x*Mathf.Sin(theta)+y*Mathf.Cos(theta);
+            camera.transform.position=new Vector3(xNew,z,yNew);
+
+            //set angle to offset
+            Vector3 offset = camera.transform.position-gb.transform.position;
+            offset=offset.normalized*-1;
+            camera.transform.rotation = Quaternion.LookRotation(offset);
+        }
+        if(Input.GetKey(KeyCode.UpArrow)){
+            float x = camera.transform.position.y;
+            float y = camera.transform.position.z;
+            float z = camera.transform.position.x;
+            float theta = 0.01f;
+            
+            float xNew = x*Mathf.Cos(theta)-y*Mathf.Sin(theta);
+            float yNew = x*Mathf.Sin(theta)+y*Mathf.Cos(theta);
+            camera.transform.position=new Vector3(z,xNew,yNew);
+
+            //set angle to offset
+            Vector3 offset = camera.transform.position-gb.transform.position;
+            offset=offset.normalized*-1;
+            camera.transform.rotation = Quaternion.LookRotation(offset);
+        }
+        if(Input.GetKey(KeyCode.DownArrow)){
+            float x = camera.transform.position.y;
+            float y = camera.transform.position.z;
+            float z = camera.transform.position.x;
+            float theta = -0.01f;
+            
+            float xNew = x*Mathf.Cos(theta)-y*Mathf.Sin(theta);
+            float yNew = x*Mathf.Sin(theta)+y*Mathf.Cos(theta);
+            camera.transform.position=new Vector3(z,xNew,yNew);
+
+            //set angle to offset
+            Vector3 offset = camera.transform.position-gb.transform.position;
+            offset=offset.normalized*-1;
+            camera.transform.rotation = Quaternion.LookRotation(offset);
+        }
+
 
         if(Input.GetKey(KeyCode.UpArrow)){ forward = 1f; }
         else if(Input.GetKey(KeyCode.DownArrow)){ forward = -1f; }
@@ -143,7 +223,7 @@ public class SimpleShipScript : MonoBehaviour
 
     }
 
-    IEnumerator ClockOneSecond()
+    protected IEnumerator ClockOneSecond()
     {
         while(true)
         {
@@ -263,7 +343,7 @@ public class SimpleShipScript : MonoBehaviour
                 }
                 
                 //Change focus if another body has stronger gravity than the current focus
-                kinematicsDisplay.UpdateDisplay(acceleration.magnitude*modelScale, velocity.magnitude*modelScale);
+                kinematicsDisplay.UpdateDisplay(acceleration.magnitude*modelScale/timeScale, velocity.magnitude*modelScale);
                     
             }
             else

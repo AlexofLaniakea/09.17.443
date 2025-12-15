@@ -14,9 +14,6 @@ public class TimeScalerScript : MonoBehaviour
 
     void Start()
     {
-        ship = GameObject.Find("Simple Ship");
-        script = ship.GetComponent<SimpleShipScript>();
-
         // Subscribe to slider value change event
         slider.onValueChanged.AddListener(OnSliderChanged);
     }
