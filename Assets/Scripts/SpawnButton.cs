@@ -49,6 +49,7 @@ public class SpawnButton : MonoBehaviour
         State.SetState(1);
         startMenu.SetActive(false);
         flightGUi.SetActive(true);
+        ship.SetActive(true);
     }
 
 }

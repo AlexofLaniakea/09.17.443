@@ -67,7 +67,7 @@ public class CompositeShip : SimpleShipScript
         thrust = thrustVector.magnitude;
         thrust /= Parameters.GetModelScale();
         int activeTanks = 0;
-        float thrustForce = thrust*mass;
+        float thrustForce = thrust*mass*Parameters.GetModelScale();
         foreach(GameObject fuelTank in fuelTanks){
             FuelTank script = fuelTank.GetComponent<FuelTank>();
             if(script.GetFuelMass() > 0){

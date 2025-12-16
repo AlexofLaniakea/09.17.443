@@ -12,7 +12,7 @@ public class FuelTank : MonoBehaviour
         fuelMass = mass;
     }
 
-    public float GetMass(){return mass; }
+    public float GetMass(){return dryMass+fuelMass; }
 
     public void UpdateMass(){mass = dryMass+fuelMass;}
 

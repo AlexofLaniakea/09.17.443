@@ -107,6 +107,7 @@ public class SimpleShipScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        camera.SetActive(true);
         if (Input.GetKey(KeyCode.A))
         {
             transform.Rotate(Vector3.up, -rotationSpeed * Time.deltaTime);
@@ -241,6 +242,8 @@ public class SimpleShipScript : MonoBehaviour
                 float updateTime = Parameters.GetUpdateTime();
                 float timeScale = Parameters.getTimeScale();
                 float modelScale = Parameters.GetModelScale();
+
+                //thrust /= modelScale/10f;//Thrust scale down
 
                 acceleration = thrust * transform.forward.normalized;
 
