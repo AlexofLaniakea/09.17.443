@@ -28,8 +28,9 @@ public class MainScript : MonoBehaviour//Manage space objects
         string[] lines = csvContent.Split('\n');
         modelScale = Parameters.GetModelScale();
 
-        foreach(string line in lines)
+        for(int i = 1; i < lines.Length; i++)
         {
+            string line = lines[i];
             string[] values = line.Split(',');
             string name = values[0];
             string primaryName = values[1];

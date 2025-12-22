@@ -75,11 +75,14 @@ public class CompositeShip : SimpleShipScript
             }
         }
         if(activeTanks == 0){
-            Debug.Log("Out of fuel");
             thrust = 0;
+            kinematicsDisplay.SetFuel(0);
+            return;
         }
         float forcePerTank = thrustForce/activeTanks*Parameters.GetUpdateTime();
         forcePerTank*= Parameters.getTimeScale();
+        float remainingFuel = 0;
+        float totalCapacity = 0;
         foreach(GameObject fuelTank in fuelTanks){
             FuelTank script = fuelTank.GetComponent<FuelTank>();
             if(script.GetFuelMass() > 0){
@@ -87,12 +90,16 @@ public class CompositeShip : SimpleShipScript
                 float massUsed = forcePerTank/specificImpulse;
                 float fuelMass = script.GetFuelMass();
                 script.SetFuelMass(fuelMass-massUsed);
-                Debug.Log(fuelMass);
-                if(fuelMass-massUsed<0){
+                fuelMass = script.GetFuelMass();
+                remainingFuel += fuelMass;
+                totalCapacity += script.GetCapacity();
+                if(fuelMass < 0){
                     script.SetFuelMass(0);
                 }
             }
         }
+        kinematicsDisplay.SetFuel(remainingFuel/totalCapacity);
+        UpdateCOM();
     }
 
     public override void SetThrust(float thrust){

@@ -7,6 +7,7 @@ public class FuelTank : MonoBehaviour
     public float dryMass;//kg
     public float fuelMass;//kg
     private float mass;
+    private float capacity;
 
     public void SetFuelMass(float mass){
         fuelMass = mass;
@@ -19,11 +20,13 @@ public class FuelTank : MonoBehaviour
     public float GetSpecificImpulse(){ return specificImpulse; }
 
     public float GetFuelMass(){ return fuelMass; }
+    public float GetCapacity(){ return capacity; }
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        capacity=fuelMass;
         UpdateMass();
     }
 

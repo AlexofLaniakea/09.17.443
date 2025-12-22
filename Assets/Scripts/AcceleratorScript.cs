@@ -23,17 +23,13 @@ public class AcceleratorScript : MonoBehaviour
         slider.onValueChanged.AddListener(OnSliderChanged);
     }
 
-    void Update()
-    {
-        //script.SetThrust(acceleration);
-    }
 
     // Called whenever the slider moves
     private void OnSliderChanged(float value)
     {
         this.value = value;
         acceleration = value * 10f/Parameters.GetModelScale();
-        textMeshPro.text = "Thrust:\n"+acceleration*Parameters.GetModelScale()+"m/s^2";
+        textMeshPro.text = "Thrust:\n"+value*100f+"%";
     }
 
     public float GetValue(){

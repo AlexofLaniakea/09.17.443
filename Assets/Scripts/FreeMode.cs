@@ -24,7 +24,7 @@ public class FreeMode : MonoBehaviour
 
         SpawnSelectionUI.SetActive(true);
         cameraModeUI.SetActive(false);
-        //SpawnButton.SetShip(ship);
+        SpawnButton.SetShip(ship);
     }
     
 }

@@ -5,23 +5,28 @@ using System.Collections.Generic;
 public class Engine : MonoBehaviour
 {
     public GameObject gb;
-    public GameObject ship;
+    public GameObject fire;
+    public Gradient flameGradient;
+    public Renderer flameRenderer;
 
     public float mass;//kg
     public float maxForce;//N
     public float fuelEfficiency;//%
-    private List<string> fuelTypes;
 
+    private List<string> fuelTypes;
     private float thrust;//N
+    private float power;
     private Vector3 thrustVector;
     private bool on = true;
 
     public void SetThrust(float thrust){
         this.thrust = thrust;
+        power = thrust/maxForce;
     }
 
     public void SetThrustPercent(float percent){            
         this.thrust = maxForce * percent;
+        power = percent;
     }
 
     public float GetThrust(){
@@ -39,6 +44,15 @@ public class Engine : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if(fire == null){
+            return;
+        }
+        Color flameColor = flameGradient.Evaluate(power);
+
+        // If using a standard material
+        flameRenderer.material.color = flameColor;
+
+        // If using emission (recommended)
+        flameRenderer.material.SetColor("_EmissionColor", flameColor);
     }
 }

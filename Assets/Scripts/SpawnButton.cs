@@ -6,13 +6,12 @@ public class SpawnButton : MonoBehaviour
 {
     public TMP_Text textMeshPro;  
  
-    public GameObject ship;
+    private static GameObject ship;
     public Button button;
     public GameObject gb;
     public GameObject startMenu;
     public GameObject flightGUi;
     public GameObject planetSelection;
-
 
     private GameObject body;
 
@@ -27,6 +26,10 @@ public class SpawnButton : MonoBehaviour
 
         textMeshPro.text = bodyScript.GetName();
         //button.onClick.AddListener(OnButtonClick);
+    }
+
+    public static void SetShip(GameObject sh){
+        ship=sh;
     }
 
 
@@ -45,11 +48,14 @@ public class SpawnButton : MonoBehaviour
 
         shipScript.SetFocus(body);
         shipScript.SetPosition(new Vector3(bodyScript.GetSystemRadius()/4f,0f,0f));
+        shipScript.SetVelocity(new Vector3(0f,0f,0f));
 
         State.SetState(1);
         startMenu.SetActive(false);
+        planetSelection.SetActive(false);
         flightGUi.SetActive(true);
         ship.SetActive(true);
-    }
+        ship.GetComponent<SimpleShipScript>().enabled=true;
 
+    }
 }

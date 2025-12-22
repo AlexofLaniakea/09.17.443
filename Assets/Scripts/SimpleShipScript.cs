@@ -22,7 +22,8 @@ public class SimpleShipScript : MonoBehaviour
     private Vector3 gravityDirection;
     private List<GravityVector> gravityVectors = new List<GravityVector>();
     private float timer = 0;
-    
+    private bool canSwitchFocus = true;
+
     
     private float timeScale = 1f; //All velocities and accelerations should be multiplied by timescale
     
@@ -54,8 +55,7 @@ public class SimpleShipScript : MonoBehaviour
     }
 
     public virtual void SetThrust(float thrust){
-        Debug.Log("SetThrustSimple");
-        this.thrust = thrust;
+        this.thrust = thrust/Parameters.GetModelScale()*10f;
     }
 
     public void SetPosition(Vector3 position){
@@ -177,7 +177,7 @@ public class SimpleShipScript : MonoBehaviour
             offset=offset.normalized*-1;
             camera.transform.rotation = Quaternion.LookRotation(offset);
         }
-        if(Input.GetKey(KeyCode.UpArrow)){
+        /*if(Input.GetKey(KeyCode.UpArrow)){
             float x = camera.transform.position.y;
             float y = camera.transform.position.z;
             float z = camera.transform.position.x;
@@ -206,7 +206,7 @@ public class SimpleShipScript : MonoBehaviour
             Vector3 offset = camera.transform.position-gb.transform.position;
             offset=offset.normalized*-1;
             camera.transform.rotation = Quaternion.LookRotation(offset);
-        }
+        }*/
 
 
         if(Input.GetKey(KeyCode.UpArrow)){ forward = 1f; }
@@ -229,6 +229,7 @@ public class SimpleShipScript : MonoBehaviour
         while(true)
         {
             while(State.GetState() != 1){
+                gb.SetActive(false);
                 yield return new WaitForSeconds(0.1f);
             }
             mainScript.Render(focus,position);
@@ -237,28 +238,20 @@ public class SimpleShipScript : MonoBehaviour
 
             float systemRadius = focusScript.GetSystemRadius();
 
+            float modelScale = Parameters.GetModelScale();
+
             if(!isFreeCam)
             {
                 float updateTime = Parameters.GetUpdateTime();
                 float timeScale = Parameters.getTimeScale();
-                float modelScale = Parameters.GetModelScale();
-
-                //thrust /= modelScale/10f;//Thrust scale down
 
                 acceleration = thrust * transform.forward.normalized;
 
-                //Change focus if too far away
+                //Add gravities of satellites
                 foreach(GameObject s in focusScript.GetSatellites()){
                     Body script = s.GetComponent<Body>();
                     GravityVector v = script.GetGravity(gb);
                     acceleration += v.getVector();
-                    float distanceFromSatellite = Vector3.Distance(transform.position, s.transform.position);
-                    if(distanceFromSatellite < script.GetSystemRadius()){
-                        Vector3 offset = (transform.position - s.transform.position);
-                        position = offset;
-                        focus = s;
-                        break;
-                    }
                 }
 
                 Vector2 r0_vec = new Vector2(position.x, position.z)*modelScale;
@@ -356,7 +349,7 @@ public class SimpleShipScript : MonoBehaviour
                 foreach(GameObject s in focusScript.GetSatellites()){
                     Body script = s.GetComponent<Body>();
                     GravityVector v = script.GetGravity(gb);
-                    //acceleration += v.getVector();
+                    acceleration += v.getVector();
                     float satelliteDistance = Vector3.Distance(s.transform.position,gb.transform.position);
                     if(satelliteDistance < closestDistance){
                         closestDistance = satelliteDistance;
@@ -368,10 +361,24 @@ public class SimpleShipScript : MonoBehaviour
             foreach(GameObject s in focusScript.GetSatellites()){
                 Body script = s.GetComponent<Body>();
                 float distanceFromSatellite = Vector3.Distance(transform.position, s.transform.position);
-                if(distanceFromSatellite < script.GetSystemRadius()){
+                if(distanceFromSatellite < script.GetSystemRadius()*(3f/4f) && canSwitchFocus){
                     Vector3 offset = (transform.position - s.transform.position);
                     position = offset;
                     focus = s;
+                    StartCoroutine(FocusSwitchTimer());
+                    //Velocity = velocty - planet velocity
+                    focusScript=focus.GetComponent<Body>();
+                    float angle = focusScript.GetAngle();
+                    float angularVelocity = focusScript.GetAngularVelocity();
+                    float radius = focusScript.GetDistance()*modelScale;
+                    float bodySpeed = radius*angularVelocity;
+                    Vector3 vDir = new Vector3(
+                    -Mathf.Sin(angle),0,
+                    Mathf.Cos(angle)
+                    );
+                    Vector3 bodyVelocity = bodySpeed*vDir;
+                    bodyVelocity /= modelScale;
+                    velocity -= bodyVelocity;
                     break;
                 }
             }
@@ -379,11 +386,24 @@ public class SimpleShipScript : MonoBehaviour
             GameObject primary = focusScript.GetPrimary();
             if(primary != null){
                 float distanceFromFocus = Vector3.Distance(transform.position, focus.transform.position);
-                if(distanceFromFocus > focusScript.GetSystemRadius())
+                if(distanceFromFocus > focusScript.GetSystemRadius() && canSwitchFocus)
                 {
                     Vector3 offset = (transform.position - primary.transform.position);
                     position = offset;
+                    //Velocity = velocty + planet velocity
+                    float angle = focusScript.GetAngle();
+                    float angularVelocity = focusScript.GetAngularVelocity();
+                    float radius = focusScript.GetDistance()*modelScale;
+                    float bodySpeed = radius*angularVelocity;
+                    Vector3 vDir = new Vector3(
+                    -Mathf.Sin(angle),0,
+                    Mathf.Cos(angle)
+                    );
+                    Vector3 bodyVelocity = bodySpeed*vDir;
+                    bodyVelocity /= modelScale;
+                    velocity += bodyVelocity;
                     focus = primary;
+                    StartCoroutine(FocusSwitchTimer());
                 }
             }
 
@@ -394,7 +414,9 @@ public class SimpleShipScript : MonoBehaviour
         
     }
 
-    public void PhysicsClock(){
-       
+    public IEnumerator FocusSwitchTimer(){
+       canSwitchFocus = true;
+       yield return new WaitForSeconds(1);
+       canSwitchFocus = true;
     }
 }

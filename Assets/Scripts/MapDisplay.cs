@@ -303,7 +303,7 @@ public class MapDisplay : MonoBehaviour
                     angularDistance = 2*Mathf.PI - angularDistance;
                 }
 
-                Debug.Log(satelliteScript.GetName()+" "+theta1+" " +angularDistance);
+                //Debug.Log(satelliteScript.GetName()+" "+theta1+" " +angularDistance);
             }
         }
         texture.Apply();

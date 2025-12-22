@@ -32,7 +32,7 @@ public class BuildZone : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(1))
         {
             // Block world click if pointer is over UI
             if (EventSystem.current != null &&
@@ -47,19 +47,46 @@ public class BuildZone : MonoBehaviour
             if (Physics.Raycast(ray, out hit, Mathf.Infinity))
             {
                 Vector3 pos = hit.point;
-                Debug.Log($"Clicked world position: {pos}");
+                //Debug.Log($"Clicked world position: {pos}");
 
                 GameObject placing = Instantiate(selected);
-                float x = Mathf.Floor(pos.x)+0.5f;
-                float y = Mathf.Floor(pos.y)+0.5f;
-                float z = Mathf.Floor(pos.z)+0.5f;
-                float height = placing.transform.localScale.z;
+                float x = Mathf.Floor(pos.x);
+                float y = Mathf.Floor(pos.y);
+                float z = Mathf.Floor(pos.z);
+                //float height = placing.transform.localScale.z;
                 pos = new Vector3(x,y,z);
-                placing.transform.position=pos + new Vector3(0,0,height/2f);
+                Vector3 size = placing.transform.localScale;
+                int mag = 1;
+                if(hit.normal.x<0||hit.normal.y<0||hit.normal.z<0){mag= -1;}
+                if(mag == 1){
+                    placing.transform.position=pos + (size/2f);
+                }
+                else{
+                    placing.transform.position=pos-size/2f+new Vector3(1,1,1)+hit.normal;
+                }
                 placing.transform.SetParent(category.transform);
                 placing.SetActive(true);
             }
         }
-    }
+        if(Input.GetMouseButtonDown(0)){
+             // Block world click if pointer is over UI
+            if (EventSystem.current != null &&
+                EventSystem.current.IsPointerOverGameObject())
+            {
+                return;
+            }
 
+            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity))
+            {
+                GameObject clickedObject = hit.collider.gameObject;
+                string name = clickedObject.name;
+                if(!name.Equals("Build Platform")){
+                    Destroy(clickedObject);
+                }
+            }  
+        }
+    }
 }

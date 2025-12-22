@@ -20,12 +20,15 @@ public class SpawnConstructedRocket : MonoBehaviour
 
     void OnButtonClick()
     {
+        ship = Instantiate(ship);
         ship.transform.SetParent(ships.transform);
         buildUI.SetActive(false);
         buildZone.SetActive(false);
-        ship.GetComponent<CompositeShip>().enabled=true;
+        //ship.GetComponent<SimpleShipScript>().enabled=true;
         startUI.SetActive(true);
         spawnSelectionUI.SetActive(true);
         ship.transform.position *= 0;
+        ship.SetActive(false);
+        SpawnButton.SetShip(ship);
     }
 }
