@@ -17,7 +17,7 @@ public class Engine : MonoBehaviour
     private float thrust;//N
     private float power;
     private Vector3 thrustVector;
-    private bool on = true;
+    private bool status = true;
 
     public void SetThrust(float thrust){
         this.thrust = thrust;
@@ -35,6 +35,10 @@ public class Engine : MonoBehaviour
 
     public float GetMass(){return mass; }
 
+    public void SetStatus(bool status){
+        this.status = status;
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -47,6 +51,7 @@ public class Engine : MonoBehaviour
         if(fire == null){
             return;
         }
+        if(!status){power = 0;}
         Color flameColor = flameGradient.Evaluate(power);
 
         // If using a standard material

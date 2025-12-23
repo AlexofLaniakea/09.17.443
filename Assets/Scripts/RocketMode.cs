@@ -14,12 +14,13 @@ public class RocketMode : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        shipScript = ship.GetComponent<SimpleShipScript>();
         button.onClick.AddListener(OnButtonClick);
     }
 
     void OnButtonClick()
     {
+        ship = Instantiate(ship);
+        shipScript = ship.GetComponent<SimpleShipScript>();
         shipScript.SetFreeCam(false);
 
         SpawnSelectionUI.SetActive(true);

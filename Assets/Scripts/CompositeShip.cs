@@ -12,13 +12,13 @@ public class CompositeShip : SimpleShipScript
     private List<GameObject> engines;
     private List<GameObject> fuelTanks;
 
-
-    private Vector3 angularVelocity;
     private Vector3 com;
-    private Vector3 thrustVector;
-    private Vector3 angularAcceleration;
 
     private float mass;
+    private float I;
+    private float torque;
+    private float angularVelocity;
+    private float angularAcceleration;
 
     public void UpdateCOM(){
         Vector3 sum = new Vector3(0,0,0);
@@ -30,7 +30,6 @@ public class CompositeShip : SimpleShipScript
             float m = script.GetMass();
             sum += position * m;
             mass += m;
-            adding += 1;
         }
         foreach(GameObject fuelTank in fuelTanks){
             FuelTank script = fuelTank.GetComponent<FuelTank>();
@@ -38,7 +37,6 @@ public class CompositeShip : SimpleShipScript
             float m = script.GetMass();
             sum += position * m;
             mass += m;
-            adding += 1;
         }
         if(otherObject != null){
             Part script = otherObject.GetComponent<Part>();
@@ -46,10 +44,51 @@ public class CompositeShip : SimpleShipScript
             float m = script.GetMass();
             sum += position * m;
             mass += m;
-            adding += 1;
         }
-        com = sum / adding;
+        com = sum / mass;
     }
+
+    public void UpdateMomentOfInertia(){
+        float modelScale = 1f;
+        I = 0f;
+        Vector2 twoDcom = new Vector2(com.x,com.z);
+        foreach(GameObject engine in engines){
+            Engine script = engine.GetComponent<Engine>();
+            Vector3 enginePos = engine.transform.position*modelScale;
+            Vector2 twopos = new Vector2(enginePos.x, enginePos.z);
+            Vector2 posPrime = twopos - twoDcom;
+            float m = script.GetMass();
+            I += m*Mathf.Pow(posPrime.magnitude, 2f);
+        }
+        foreach(GameObject fuelTank in fuelTanks){
+            FuelTank script = fuelTank.GetComponent<FuelTank>();
+            Vector3 tankPos = fuelTank.transform.position*modelScale;
+            Vector2 twopos = new Vector2(tankPos.x, tankPos.z);
+            Vector2 posPrime = twopos - twoDcom;
+            float m = script.GetMass();
+            I += m*Mathf.Pow(posPrime.magnitude, 2f);
+        }
+    }
+
+    public void UpdateTorque(){
+        float modelScale = 1f;
+        torque = 0f;
+        Vector3 com2D = new Vector3(com.x, com.z, 0f);
+        foreach(GameObject engine in engines){
+            Engine script = engine.GetComponent<Engine>();
+            Vector3 enginePos = engine.transform.position;
+            Vector3 twopos = new Vector3(enginePos.x, enginePos.z, 0f);
+            Vector3 posPrime = twopos - com2D;
+            float m = script.GetMass();
+            Vector3 orientation = engine.transform.forward.normalized;
+            float force = script.GetThrust();
+            Vector3 forceVector = force * orientation;
+            Vector3 forceVector2D = new Vector3(forceVector.x, forceVector.z, 0f);
+            torque += Vector3.Cross(posPrime, forceVector2D).z;
+        }
+        angularAcceleration = torque / I;
+    }
+
 
     public void UpdateThrustVector(){
         Vector3 sum = new Vector3(0,0,0);
@@ -77,6 +116,10 @@ public class CompositeShip : SimpleShipScript
         if(activeTanks == 0){
             thrust = 0;
             kinematicsDisplay.SetFuel(0);
+            foreach(GameObject engine in engines){
+                Engine script = engine.GetComponent<Engine>();
+                script.SetStatus(false);
+            }
             return;
         }
         float forcePerTank = thrustForce/activeTanks*Parameters.GetUpdateTime();
@@ -99,7 +142,6 @@ public class CompositeShip : SimpleShipScript
             }
         }
         kinematicsDisplay.SetFuel(remainingFuel/totalCapacity);
-        UpdateCOM();
     }
 
     public override void SetThrust(float thrust){
@@ -124,6 +166,7 @@ public class CompositeShip : SimpleShipScript
         }
         com = new Vector3(0,0,0);
         UpdateCOM();
+        UpdateMomentOfInertia();
         UpdateThrustVector();
 
         mainScript = main.GetComponent<MainScript>();
@@ -134,6 +177,17 @@ public class CompositeShip : SimpleShipScript
     IEnumerator ClockOneSecond2(){
         while(true){
             UpdateThrustVector();
+            UpdateCOM();
+            UpdateMomentOfInertia();
+            UpdateTorque();
+            float timeScale = Parameters.getTimeScale();
+            float updateTime = Parameters.GetUpdateTime();
+
+            //rotate shi
+            angularVelocity += angularAcceleration * timeScale*updateTime;
+            gb.transform.eulerAngles += new Vector3(0,angularVelocity*updateTime*timeScale,0);
+            Debug.Log(angularVelocity);
+            //gb.transform.Rotate(Vector3.forward, angularVelocity * updateTime, Space.Self);
             yield return new WaitForSeconds(Parameters.GetUpdateTime());
         }
     }

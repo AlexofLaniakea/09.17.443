@@ -29,8 +29,10 @@ public class SimpleShipScript : MonoBehaviour
     
     //Physics scalars
     protected float thrust= 0f;
+    protected Vector3 thrustVector;
     private float right = 0;
     private float forward = 0;
+    private bool threeD = false;
 
     //3D kinematics variables. Stored in 1 unit = 1000 m
     private Vector3 position;
@@ -56,6 +58,7 @@ public class SimpleShipScript : MonoBehaviour
 
     public virtual void SetThrust(float thrust){
         this.thrust = thrust/Parameters.GetModelScale()*10f;
+        thrustVector = this.thrust * transform.forward.normalized;
     }
 
     public void SetPosition(Vector3 position){
@@ -101,7 +104,6 @@ public class SimpleShipScript : MonoBehaviour
     {
         mainScript = main.GetComponent<MainScript>();
         StartCoroutine(ClockOneSecond());
-        //position = new Vector3(150000000f, 0f, 30000f);
     }
 
     // Update is called once per frame
@@ -245,7 +247,7 @@ public class SimpleShipScript : MonoBehaviour
                 float updateTime = Parameters.GetUpdateTime();
                 float timeScale = Parameters.getTimeScale();
 
-                acceleration = thrust * transform.forward.normalized;
+                acceleration = thrustVector/modelScale;
 
                 //Add gravities of satellites
                 foreach(GameObject s in focusScript.GetSatellites()){
@@ -376,9 +378,11 @@ public class SimpleShipScript : MonoBehaviour
                     -Mathf.Sin(angle),0,
                     Mathf.Cos(angle)
                     );
-                    Vector3 bodyVelocity = bodySpeed*vDir;
-                    bodyVelocity /= modelScale;
-                    velocity -= bodyVelocity;
+                    if(!isFreeCam){
+                        Vector3 bodyVelocity = bodySpeed*vDir;
+                        bodyVelocity /= modelScale;
+                        velocity -= bodyVelocity;
+                    }
                     break;
                 }
             }
@@ -399,9 +403,11 @@ public class SimpleShipScript : MonoBehaviour
                     -Mathf.Sin(angle),0,
                     Mathf.Cos(angle)
                     );
-                    Vector3 bodyVelocity = bodySpeed*vDir;
-                    bodyVelocity /= modelScale;
-                    velocity += bodyVelocity;
+                    if(!isFreeCam){
+                        Vector3 bodyVelocity = bodySpeed*vDir;
+                        bodyVelocity /= modelScale;
+                        velocity += bodyVelocity;
+                    }
                     focus = primary;
                     StartCoroutine(FocusSwitchTimer());
                 }

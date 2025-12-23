@@ -47,22 +47,44 @@ public class BuildZone : MonoBehaviour
             if (Physics.Raycast(ray, out hit, Mathf.Infinity))
             {
                 Vector3 pos = hit.point;
-                //Debug.Log($"Clicked world position: {pos}");
 
                 GameObject placing = Instantiate(selected);
                 float x = Mathf.Floor(pos.x);
                 float y = Mathf.Floor(pos.y);
                 float z = Mathf.Floor(pos.z);
-                //float height = placing.transform.localScale.z;
+
                 pos = new Vector3(x,y,z);
                 Vector3 size = placing.transform.localScale;
+                Vector3 rotatedSize = size;
                 int mag = 1;
+                if(hit.normal.x == -1.00){ 
+                    placing.transform.eulerAngles = new Vector3(0,-90f,0);
+                    rotatedSize = new Vector3(size.z, size.y, size.x);
+                }
+                else if(hit.normal.x == 1.00){ 
+                    placing.transform.eulerAngles = new Vector3(0,90f,0);
+                    rotatedSize = new Vector3(size.z, size.y, size.x);
+                }
+                else if (hit.normal.z < 0)
+                {
+                    placing.transform.eulerAngles = new Vector3(0, 180f, 0);
+                }
+                else if (hit.normal.y > 0)
+                {
+                    placing.transform.eulerAngles = new Vector3(-90f, 0, 0);
+                    rotatedSize = new Vector3(size.x, size.z, size.y);
+                }
+                else if (hit.normal.y < 0)
+                {
+                    placing.transform.eulerAngles = new Vector3(90f, 0, 0);
+                    rotatedSize = new Vector3(size.x, size.z, size.y);
+                }
                 if(hit.normal.x<0||hit.normal.y<0||hit.normal.z<0){mag= -1;}
                 if(mag == 1){
-                    placing.transform.position=pos + (size/2f);
+                    placing.transform.position=pos + (rotatedSize/2f);
                 }
                 else{
-                    placing.transform.position=pos-size/2f+new Vector3(1,1,1)+hit.normal;
+                    placing.transform.position=pos-rotatedSize/2f+new Vector3(1,1,1)+hit.normal;
                 }
                 placing.transform.SetParent(category.transform);
                 placing.SetActive(true);
