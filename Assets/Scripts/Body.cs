@@ -98,6 +98,9 @@ public class Body : MonoBehaviour
 
     public void SetPrimary(GameObject primary){
         this.primary = primary;
+        Body primaryScript = primary.GetComponent<Body>();
+        float primaryMass = primaryScript.GetMass();
+        systemRadius = distance*Mathf.Pow(mass/(3*primaryMass),1/3f);
     }
 
     public string GetName(){

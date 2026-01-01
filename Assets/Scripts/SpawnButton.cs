@@ -47,7 +47,7 @@ public class SpawnButton : MonoBehaviour
         Body bodyScript = body.GetComponent<Body>();
 
         shipScript.SetFocus(body);
-        shipScript.SetPosition(new Vector3(bodyScript.GetSystemRadius()/4f,0f,0f));
+        shipScript.SetPosition(new Vector3(bodyScript.GetSystemRadius()/8f,0f,0f));
         shipScript.SetVelocity(new Vector3(0f,0f,0f));
 
         State.SetState(1);
