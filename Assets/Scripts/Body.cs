@@ -8,16 +8,18 @@ public class Body : MonoBehaviour
     private GameObject skyPoint;
 
     private string name;
-    private float mass; //(float)5.972 * Mathf.Pow(10, 24);
+    private float mass;
     private GameObject shipsListObject;
     private List<GameObject> ships;
     private float G = (float)6.673 * Mathf.Pow(10, -11);
     private float velocity = 0f;
     private float diameter;
     private float systemRadius;
+    private float neighborhoodRadius = 0f;
 
     private List<GameObject> satellites;
     private GameObject primary;
+    private List<NeighborEdge> neighbors;
 
     private float distance;
     private float angle;
@@ -25,7 +27,8 @@ public class Body : MonoBehaviour
 
     
 
-    public void Initialize(string name, float size, float mass, float distance, float angle, float angularVelocity){
+    public void Initialize(string name, float size, float mass, float distance, float angle, float angularVelocity,
+    string texture){
         this.name = name;
         gameObject.name = name;
         this.mass = mass;
@@ -37,30 +40,28 @@ public class Body : MonoBehaviour
         this.angle = angle;
         this.angularVelocity = angularVelocity;
 
+        skyPoint = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        skyPoint.name = name + " Sky Point";
+        //skyPoint.transform.SetParent(transform);
+        texture = texture.Replace("\r", "").Replace("\n", "");
         // load material from Resources/PlanetTextures/[name]
-        Material mat = Resources.Load<Material>("PlanetTextures/" + name);
+        Material mat = Resources.Load<Material>("PlanetTextures/" + texture);
         if (mat != null)
         {
             // assign to MeshRenderer
             MeshRenderer renderer = GetComponent<MeshRenderer>();
+            MeshRenderer skyPointRenderer = skyPoint.GetComponent<MeshRenderer>();
             if (renderer != null)
             {
                 renderer.material = mat;
+                skyPointRenderer.material = mat;
             }
         }
 
-        ships = new List<GameObject>();
         satellites = new List<GameObject>();
+        neighbors = new List<NeighborEdge>();
 
-
-        shipsListObject = GameObject.Find("Ships");
-        foreach (Transform child in shipsListObject.transform)
-        {
-            ships.Add(child.gameObject);
-        }
-
-        //skyPoint = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        //Destroy(skyPoint.GetComponent<Collider>());        
+        Destroy(skyPoint.GetComponent<Collider>());        
         //skyPoint.transform.localScale *= 10f;
 
         gb = this.gameObject;
@@ -85,6 +86,13 @@ public class Body : MonoBehaviour
         satellite.GetComponent<Body>().SetPrimary(gb);
         if(satelliteScript.GetDistance() * 1.25f > systemRadius){
             systemRadius = satelliteScript.GetDistance() * 1.25f;
+        }
+    }
+
+    public void AddNeighbor(NeighborEdge neighbor){
+        neighbors.Add(neighbor);
+        if(neighbor.GetDistance() * 1.25f > neighborhoodRadius){
+            neighborhoodRadius = neighbor.GetDistance() * 1.25f;
         }
     }
 
@@ -116,6 +124,8 @@ public class Body : MonoBehaviour
         return satellites;
     }
 
+    public List<NeighborEdge> GetNeighbors(){ return neighbors; }
+
     public GameObject GetPrimary(){
         return primary;
     }
@@ -127,6 +137,7 @@ public class Body : MonoBehaviour
     public float GetDiameter(){ return diameter;}
 
     public float GetSystemRadius(){ return systemRadius; }
+    public float GetNeighborhoodRadius(){ return neighborhoodRadius;}
 
     public GravityVector GetGravity(GameObject ship)
     {
@@ -144,23 +155,15 @@ public class Body : MonoBehaviour
     public void SetSkyPoint(Vector3 position)
     {
         skyPoint.transform.position = position;
-    }
-
-    void FixedUpdate()
-    {    
-
-        //Move satellites
-        /*foreach(GameObject satellite in satellites){
-            float distance = Vector3.Distance(transform.position, satellite.transform.position);
-            //Debug.Log(distance);  
-            Vector3 offset = transform.position - satellite.transform.position;
-            offset = offset.normalized;
-            Vector3 tangent = Vector3.Cross(Vector3.up, offset).normalized;
-            Body satelliteScript = satellite.GetComponent<Body>();
-            float velocity = satelliteScript.GetVelocity();
-            //satellite.GetComponent<Rigidbody>().linearVelocity = tangent * velocity * timeScale;
-            satellite.GetComponent<Rigidbody>().transform.RotateAround(transform.position, Vector3.up, 2.7f * Mathf.Pow(10f, -6f) * timeScale);
-        }*/
+        float realDistance = gb.transform.position.magnitude;
+        float skyDistance = position.magnitude;
+        float skyDiameter = diameter * skyDistance/realDistance;
+        if(skyDiameter < 5000f){
+            skyDiameter = 5000f;
+        }
+        skyPoint.transform.localScale = new Vector3(skyDiameter,skyDiameter,1);
+        skyPoint.transform.rotation = Quaternion.LookRotation(position);
+        skyPoint.SetActive(gameObject.activeSelf);
     }
 
     public void PhysicsClock(){
@@ -187,6 +190,15 @@ public class Body : MonoBehaviour
             satelliteScript.RenderSatellites();
             satellite.SetActive(true);
         }
+        foreach(NeighborEdge neighbor in neighbors){
+            float neighborAngle = neighbor.GetAngle();
+            float neighborDistance = neighbor.GetDistance();
+            float x = transform.position.x + neighborDistance * Mathf.Cos(neighborAngle);
+            float y = transform.position.y;
+            float z = transform.position.z + neighborDistance * Mathf.Sin(neighborAngle);
+            neighbor.GetBody().transform.position = new Vector3(x,y,z);
+            neighbor.GetBody().SetActive(true);
+        }
     }
 
     public void RenderPrimary(){
@@ -198,5 +210,9 @@ public class Body : MonoBehaviour
         angle += angularVelocity;
         primary.SetActive(true);
         primaryScript.RenderSatellites();
+    }
+
+    public void RenderNeighbors(){
+       
     }
 }

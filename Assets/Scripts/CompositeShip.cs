@@ -87,6 +87,8 @@ public class CompositeShip : SimpleShipScript
             torque += Vector3.Cross(posPrime, forceVector2D).z;
         }
         angularAcceleration = torque / I;
+        angularAcceleration *= 180f/Mathf.PI;
+        if(angularAcceleration < 0.01f){ angularAcceleration = 0f; }
     }
 
 
@@ -115,6 +117,7 @@ public class CompositeShip : SimpleShipScript
         }
         if(activeTanks == 0){
             thrust = 0;
+            thrustVector *= 0;
             kinematicsDisplay.SetFuel(0);
             foreach(GameObject engine in engines){
                 Engine script = engine.GetComponent<Engine>();
@@ -176,9 +179,9 @@ public class CompositeShip : SimpleShipScript
 
     IEnumerator ClockOneSecond2(){
         while(true){
-            UpdateThrustVector();
             UpdateCOM();
             UpdateMomentOfInertia();
+            UpdateThrustVector();
             UpdateTorque();
             float timeScale = Parameters.getTimeScale();
             float updateTime = Parameters.GetUpdateTime();
@@ -186,7 +189,6 @@ public class CompositeShip : SimpleShipScript
             //rotate shi
             angularVelocity += angularAcceleration * timeScale*updateTime;
             gb.transform.eulerAngles += new Vector3(0,angularVelocity*updateTime*timeScale,0);
-            Debug.Log(angularVelocity);
             //gb.transform.Rotate(Vector3.forward, angularVelocity * updateTime, Space.Self);
             yield return new WaitForSeconds(Parameters.GetUpdateTime());
         }

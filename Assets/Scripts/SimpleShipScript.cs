@@ -57,7 +57,7 @@ public class SimpleShipScript : MonoBehaviour
     }
 
     public virtual void SetThrust(float thrust){
-        this.thrust = thrust/Parameters.GetModelScale()*10f;
+        this.thrust = thrust*10f;
         thrustVector = this.thrust * transform.forward.normalized;
     }
 
@@ -238,8 +238,6 @@ public class SimpleShipScript : MonoBehaviour
 
             Body focusScript = focus.GetComponent<Body>();
 
-            float systemRadius = focusScript.GetSystemRadius();
-
             float modelScale = Parameters.GetModelScale();
 
             if(!isFreeCam)
@@ -386,10 +384,11 @@ public class SimpleShipScript : MonoBehaviour
                     break;
                 }
             }
+            float distanceFromFocus = Vector3.Distance(transform.position, focus.transform.position);
 
             GameObject primary = focusScript.GetPrimary();
             if(primary != null){
-                float distanceFromFocus = Vector3.Distance(transform.position, focus.transform.position);
+                distanceFromFocus = Vector3.Distance(transform.position, focus.transform.position);
                 if(distanceFromFocus > focusScript.GetSystemRadius() && canSwitchFocus)
                 {
                     Vector3 offset = (transform.position - primary.transform.position);
@@ -410,6 +409,21 @@ public class SimpleShipScript : MonoBehaviour
                     }
                     focus = primary;
                     StartCoroutine(FocusSwitchTimer());
+                }
+            }
+
+            //Manage focus change between neighbors
+            float systemRadius = focusScript.GetSystemRadius();
+            float neighborhoodRadius = focusScript.GetNeighborhoodRadius();
+            if(focusScript.GetPrimary() == null){
+                foreach(NeighborEdge neighbor in focusScript.GetNeighbors()){
+                    GameObject neighborBody = neighbor.GetBody();
+                    float distanceNeighbor = Vector3.Distance(transform.position, neighborBody.transform.position);
+                    if(distanceNeighbor < distanceFromFocus * 0.99f){
+                        Vector3 offset = (transform.position - neighborBody.transform.position);
+                        position = offset;
+                        focus = neighborBody;
+                    }
                 }
             }
 

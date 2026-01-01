@@ -57,28 +57,28 @@ public class BuildZone : MonoBehaviour
                 Vector3 size = placing.transform.localScale;
                 Vector3 rotatedSize = size;
                 int mag = 1;
-                if(hit.normal.x == -1.00){ 
+                /*if(hit.normal.x < -0.1){ 
                     placing.transform.eulerAngles = new Vector3(0,-90f,0);
                     rotatedSize = new Vector3(size.z, size.y, size.x);
                 }
-                else if(hit.normal.x == 1.00){ 
+                else if(hit.normal.x > 0.1){ 
                     placing.transform.eulerAngles = new Vector3(0,90f,0);
                     rotatedSize = new Vector3(size.z, size.y, size.x);
                 }
-                else if (hit.normal.z < 0)
+                else if (hit.normal.z < -0.1)
                 {
                     placing.transform.eulerAngles = new Vector3(0, 180f, 0);
                 }
-                else if (hit.normal.y > 0)
+                else if (hit.normal.y > 0.1)
                 {
                     placing.transform.eulerAngles = new Vector3(-90f, 0, 0);
                     rotatedSize = new Vector3(size.x, size.z, size.y);
                 }
-                else if (hit.normal.y < 0)
+                else if (hit.normal.y < -0.1)
                 {
                     placing.transform.eulerAngles = new Vector3(90f, 0, 0);
                     rotatedSize = new Vector3(size.x, size.z, size.y);
-                }
+                }*/
                 if(hit.normal.x<0||hit.normal.y<0||hit.normal.z<0){mag= -1;}
                 if(mag == 1){
                     placing.transform.position=pos + (rotatedSize/2f);

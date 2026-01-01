@@ -111,8 +111,9 @@ public class MapDisplay : MonoBehaviour
         Body focusScript = focus.GetComponent<Body>();
         SimpleShipScript shipScript = ship.GetComponent<SimpleShipScript>();
 
-
         this.ship = ship;
+
+        float dist = Vector3.Distance(focus.transform.position, ship.transform.position);
 
         foreach(GameObject satellite in satellites){
             Destroy(satellite);
@@ -122,9 +123,11 @@ public class MapDisplay : MonoBehaviour
         
         int satelliteCount = focusScript.GetSatellites().Count;
 
-        float radius;
-
-        radius = focusScript.GetSystemRadius();
+        float radius = focusScript.GetSystemRadius();
+        float neighborhoodRadius = focusScript.GetNeighborhoodRadius();
+        if(dist > radius && neighborhoodRadius > radius){
+            radius = neighborhoodRadius;
+        }
 
         foreach(GameObject satellite in focusScript.GetSatellites()){
             Body satelliteScript = satellite.GetComponent<Body>();
@@ -132,6 +135,23 @@ public class MapDisplay : MonoBehaviour
             float realDistance = satelliteScript.GetDistance();
             float ratio = satelliteScript.GetDistance() / radius;
             float angle = satelliteScript.GetAngle();
+            float guiDistance = ratio * mapWidth / 2;
+
+            float x = guiDistance * Mathf.Cos(angle);
+            float y = guiDistance * Mathf.Sin(angle);
+            
+            image.transform.SetParent(gb.transform);
+            image.GetComponent<RectTransform>().localPosition = new Vector2(x, y);
+            image.SetActive(true);
+
+            satellites.Add(image);
+        }
+
+        foreach(NeighborEdge neighbor in focusScript.GetNeighbors()){
+            GameObject image = Instantiate(satellitePrefab);
+            float realDistance = neighbor.GetDistance();
+            float ratio = neighbor.GetDistance() / radius;
+            float angle = neighbor.GetAngle();
             float guiDistance = ratio * mapWidth / 2;
 
             float x = guiDistance * Mathf.Cos(angle);
@@ -168,10 +188,12 @@ public class MapDisplay : MonoBehaviour
                 texture.SetPixel(i, j, Color.black);
             }
         }
-        if(false && zoom >= 1.1f){
+
+        if(false && radius==neighborhoodRadius){
             texture.Apply();
             return;
         }
+
 
         //Create graph
         float modelScale = Parameters.GetModelScale();
@@ -308,6 +330,10 @@ public class MapDisplay : MonoBehaviour
         }
         texture.Apply();
     }   
+
+    public void RenderNeighborhood(GameObject focus, GameObject ship){
+        return;
+    }
 
     public void UpdateDisplay(){
         //Set ship dot to position relative to center
